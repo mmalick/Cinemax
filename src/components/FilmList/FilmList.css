@@ -1,0 +1,45 @@
+.film-list-container {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  cursor: grab;
+  padding-left: 10px;
+  max-width: 100%;
+  /* scroll-behavior: smooth; 🔥 Dodana płynność */
+  user-select: none; /* 🔥 Blokuje zaznaczanie tekstu */
+  -webkit-user-select: none; /* Safari/Chrome */
+  -ms-user-select: none; /* Edge */
+}
+
+.film-list-container:active {
+  cursor: grabbing;
+}
+
+.film-list-container::-webkit-scrollbar {
+  display: none;
+}
+
+.film-card {
+  flex: 0 0 calc(100% / 6 - 15px);
+  max-width: calc(100% / 6 - 15px);
+  min-width: 160px;
+  background: black;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+  user-select: none; /* 🔥 Blokuje zaznaczanie tekstu */
+  -webkit-user-select: none; /* Safari/Chrome */
+  -ms-user-select: none; /* Edge */
+}
+
+.film-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+  -webkit-user-drag: none; /* 🔥 Wyłączamy dragowanie w Chrome */
+  pointer-events: none; /* 🔥 Zapobiega przeciąganiu */
+}
+

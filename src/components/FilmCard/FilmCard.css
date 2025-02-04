@@ -1,0 +1,34 @@
+.film-card {
+    width: 150px;
+    background-color: #1a1a1a;
+    color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .film-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .film-poster {
+    width: 100%;
+    height: 225px;
+    object-fit: cover;
+  }
+  
+  .film-info {
+    padding: 10px;
+  }
+  
+  .film-title {
+    font-size: 14px;
+    margin: 5px 0;
+  }
+  
+  .film-rating {
+    font-size: 18px;
+    color: #f39c12;
+  }
+  
