@@ -1,14 +1,13 @@
 import React from 'react';
-import './FilmCard.css';
 
-interface FilmCardProps {  poster: string;
-  
+interface FilmCardProps {
+  poster: string; // Teraz to 'poster_url'
 }
 
 const FilmCard: React.FC<FilmCardProps> = ({ poster }) => {
   return (
     <div className="film-card">
-      <img src={poster}  draggable="false" />
+      <img src={poster} alt="Film poster" style={{ width: '200px', height: '300px' }} />
     </div>
   );
 };

@@ -3,7 +3,9 @@ import './FilmList.css';
 import FilmCard from '../FilmCard/FilmCard';
 
 interface Film {
-  poster: string;
+  poster_url: string; // Zmieniamy z 'poster' na 'poster_url'
+  title: string;
+  overview: string;
 }
 
 interface FilmListProps {
@@ -36,6 +38,10 @@ const FilmList: React.FC<FilmListProps> = ({ films, title }) => {
     listRef.current.scrollLeft = scrollLeft - walk;
   };
 
+  if (!films || films.length === 0) {
+    return <p>Brak filmów do wyświetlenia</p>;
+  }
+
   return (
     <div className="film-list">
       {title && <h2 className="film-list-title">{title}</h2>}
@@ -48,7 +54,7 @@ const FilmList: React.FC<FilmListProps> = ({ films, title }) => {
         onMouseMove={handleMouseMove}
       >
         {films.map((film, index) => (
-          <FilmCard key={index} {...film} />
+          <FilmCard key={index} poster={film.poster_url} /> 
         ))}
       </div>
     </div>
