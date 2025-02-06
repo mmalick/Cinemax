@@ -1,18 +1,14 @@
 import React from 'react';
 import './FilmCard.css';
 
-interface FilmCardProps {
-  title: string;
-  poster: string;
-  rating: number;
+interface FilmCardProps {  poster: string;
+  
 }
 
-const FilmCard: React.FC<FilmCardProps> = ({ title, poster, rating }) => {
+const FilmCard: React.FC<FilmCardProps> = ({ poster }) => {
   return (
     <div className="film-card">
-      <img src={poster} alt={title} draggable="false" />
-      <h3>{title}</h3>
-      <p>{"⭐".repeat(rating)}</p>
+      <img src={poster}  draggable="false" />
     </div>
   );
 };

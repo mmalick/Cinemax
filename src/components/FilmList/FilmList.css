@@ -7,10 +7,9 @@
   cursor: grab;
   padding-left: 10px;
   max-width: 100%;
-  /* scroll-behavior: smooth; 🔥 Dodana płynność */
-  user-select: none; /* 🔥 Blokuje zaznaczanie tekstu */
-  -webkit-user-select: none; /* Safari/Chrome */
-  -ms-user-select: none; /* Edge */
+  user-select: none; 
+  -webkit-user-select: none; 
+  -ms-user-select: none;
 }
 
 .film-list-container:active {
@@ -30,16 +29,16 @@
   padding: 10px;
   border-radius: 10px;
   text-align: center;
-  user-select: none; /* 🔥 Blokuje zaznaczanie tekstu */
-  -webkit-user-select: none; /* Safari/Chrome */
-  -ms-user-select: none; /* Edge */
+  user-select: none; 
+  -webkit-user-select: none; 
+  -ms-user-select: none; 
 }
 
 .film-card img {
   width: 100%;
   height: auto;
   border-radius: 5px;
-  -webkit-user-drag: none; /* 🔥 Wyłączamy dragowanie w Chrome */
-  pointer-events: none; /* 🔥 Zapobiega przeciąganiu */
+  -webkit-user-drag: none;
+  pointer-events: none; 
 }
 
