@@ -3,9 +3,7 @@ import './FilmList.css';
 import FilmCard from '../FilmCard/FilmCard';
 
 interface Film {
-  title: string;
   poster: string;
-  rating: number;
 }
 
 interface FilmListProps {
@@ -34,7 +32,7 @@ const FilmList: React.FC<FilmListProps> = ({ films, title }) => {
     if (!isDragging || !listRef.current) return;
     e.preventDefault();
     const x = e.pageX - listRef.current.offsetLeft;
-    const walk = (x - startX) * 0.6; // 🔥 Spowalniamy przesuwanie
+    const walk = (x - startX) * 0.6;
     listRef.current.scrollLeft = scrollLeft - walk;
   };
 
