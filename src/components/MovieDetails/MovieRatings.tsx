@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface MovieRatingsProps {
   movieId: string;
@@ -11,11 +11,15 @@ const MovieRatings: React.FC<MovieRatingsProps> = ({ movieId, tmdbRating, tmdbVo
 
   const handleRating = async (userRating: number) => {
     setRating(userRating);
-    
-    // Zapisz ocenę w bazie
+
+    const token = localStorage.getItem("token"); // Pobierz token JWT
+
     await fetch(`http://localhost:8000/api/movies/${movieId}/rate/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify({ rating: userRating })
     });
   };
@@ -29,7 +33,7 @@ const MovieRatings: React.FC<MovieRatingsProps> = ({ movieId, tmdbRating, tmdbVo
       <div className="user-rating">
         <h3>Your Rating:</h3>
         <div className="rating-stars">
-          {[1, 2, 3, 4, 5].map((star) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
             <span 
               key={star} 
               className={`star ${rating && rating >= star ? 'selected' : ''}`} 

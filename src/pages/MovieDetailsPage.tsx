@@ -4,16 +4,22 @@ import MovieCast from "../components/MovieDetails/MovieCast";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api/movies/";
 
+interface StreamingProvider {
+    name: string;
+    logo: string;
+}
+
 interface Movie {
     title: string;
     overview: string;
     poster_path: string;
     vote_average: number;
     vote_count: number;
+    streaming: StreamingProvider[];
 }
 
 export default function MovieDetailsPage() {
-    const { id } = useParams<{ id?: string }>(); // Opcjonalne id
+    const { id } = useParams<{ id?: string }>();
     const [movie, setMovie] = useState<Movie | null>(null);
 
     useEffect(() => {
@@ -47,7 +53,21 @@ export default function MovieDetailsPage() {
                 <p>{movie.overview}</p>
                 <p className="rating">⭐ {movie.vote_average.toFixed(1)} ({movie.vote_count} głosów)</p>
 
-                {/* Przerobiony MovieCast */}
+                {/* Streaming */}
+                {movie.streaming.length > 0 ? (
+                    <div className="streaming-section">
+                        <h3>Gdzie obejrzeć:</h3>
+                        <div className="streaming-list">
+                            {movie.streaming.map((provider) => (
+                                <div key={provider.name} className="streaming-provider">
+                                    <img src={provider.logo} alt={provider.name} />
+                                    <p>{provider.name}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ) : <p>Brak informacji o dostępności</p>}
+
                 <MovieCast movieId={id || ""} />
             </div>
         </div>
