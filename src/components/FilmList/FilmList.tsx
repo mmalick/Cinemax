@@ -3,7 +3,8 @@ import './FilmList.css';
 import FilmCard from '../FilmCard/FilmCard';
 
 interface Film {
-  poster_url: string; // Zmieniamy z 'poster' na 'poster_url'
+  id: number; // Dodajemy ID filmu
+  poster_url: string;
   title: string;
   overview: string;
 }
@@ -53,8 +54,8 @@ const FilmList: React.FC<FilmListProps> = ({ films, title }) => {
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
       >
-        {films.map((film, index) => (
-          <FilmCard key={index} poster={film.poster_url} /> 
+        {films.map((film) => (
+          <FilmCard key={film.id} id={film.id} poster={film.poster_url} />
         ))}
       </div>
     </div>

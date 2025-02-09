@@ -1,0 +1,51 @@
+.movie-cast-container {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    cursor: grab;
+    padding-left: 10px;
+    max-width: 100%;
+    user-select: none;
+  }
+  
+  .movie-cast-container:active {
+    cursor: grabbing;
+  }
+  
+  .movie-cast-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .actor-card {
+    flex: 0 0 calc(100% / 6 - 15px);
+    max-width: calc(100% / 6 - 15px);
+    min-width: 160px;
+    background: black;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    user-select: none;
+  }
+  
+  .actor-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    -webkit-user-drag: none;
+    pointer-events: none;
+  }
+  
+  .actor-name {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 5px;
+  }
+  
+  .actor-character {
+    font-size: 12px;
+    opacity: 0.8;
+  }
+  

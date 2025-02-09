@@ -1,12 +1,12 @@
 import React from 'react';
 import Navbar from '../components/Navbar/Navbar';
-import Films from '../components/Films/Films';
+import MovieSection from '../components/MovieSection/MovieSection';
 
 const FilmsPage: React.FC = () => {
   return (
     <div className="films-page">
       <Navbar />
-      <Films />
+      <MovieSection title="Top Rated" category="top_rated" viewType="grid"/>
     </div>
   );
 };
