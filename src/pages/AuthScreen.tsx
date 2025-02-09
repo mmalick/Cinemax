@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar/Navbar";
-import './AuthScreen.css'; // Importowanie pliku CSS
+import "./AuthScreen.css";
 
 interface AuthProps {
   isSignUp?: boolean;
@@ -13,15 +13,54 @@ const AuthScreen: React.FC<AuthProps> = ({ isSignUp = false }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (isSignUp && password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
+
     setError("");
-    console.log(isSignUp ? "Signing up..." : "Logging in...");
+    setMessage("");
+
+    const userData = isSignUp
+      ? { username, email, password } // Rejestracja wymaga emaila
+      : { username, password }; // Logowanie - UPEWNIJ SIĘ, CZY BACKEND NIE WYMAGA EMAILA
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/${isSignUp ? "register" : "login"}/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userData),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Something went wrong");
+      }
+
+      if (isSignUp) {
+        setMessage("Registration successful! You can now log in.");
+      } else {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", data.username);
+        localStorage.setItem("loginTime", Date.now().toString()); // Zapisywanie czasu logowania
+        window.dispatchEvent(new Event("storage")); // 🔥 Wysyła event do Navbar
+        navigate("/"); // Przekierowanie do strony głównej po zalogowaniu
+      }
+    } catch (error: any) {
+      setError(error.message);
+    }
   };
 
   return (
@@ -31,23 +70,28 @@ const AuthScreen: React.FC<AuthProps> = ({ isSignUp = false }) => {
         <div className="auth-box">
           <h2>{isSignUp ? "Sign Up" : "Login"}</h2>
           {error && <p className="error-message">{error}</p>}
+          {message && <p className="success-message">{message}</p>}
           <form onSubmit={handleSubmit}>
-          <input
-              type="username"
+            {/* Pole username zarówno dla rejestracji, jak i logowania */}
+            <input
+              type="text"
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="input-box"
               required
             />
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input-box"
-              required
-            />
+            {/* Email tylko podczas rejestracji */}
+            {isSignUp && (
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input-box"
+                required
+              />
+            )}
             <input
               type="password"
               placeholder="Password"
