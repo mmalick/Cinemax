@@ -17,18 +17,3 @@
     height: 225px;
     object-fit: cover;
   }
-  
-  .film-info {
-    padding: 10px;
-  }
-  
-  .film-title {
-    font-size: 14px;
-    margin: 5px 0;
-  }
-  
-  .film-rating {
-    font-size: 18px;
-    color: #f39c12;
-  }
-  
