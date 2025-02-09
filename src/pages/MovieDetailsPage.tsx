@@ -21,6 +21,9 @@ interface Movie {
 export default function MovieDetailsPage() {
     const { id } = useParams<{ id?: string }>();
     const [movie, setMovie] = useState<Movie | null>(null);
+    const [rating, setRating] = useState<number | null>(null);
+    const [userRating, setUserRating] = useState<number | null>(null);
+    const token = localStorage.getItem("token"); // Pobierz token użytkownika
 
     useEffect(() => {
         if (!id) return;
@@ -36,8 +39,52 @@ export default function MovieDetailsPage() {
             }
         }
 
+        async function fetchUserRating() {
+            if (!token) return;
+            try {
+                const response = await fetch(`${API_BASE_URL}${id}/rate/`, {
+                    method: "GET",
+                    headers: { Authorization: `Token ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setUserRating(data.rating);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
         fetchMovieDetails();
-    }, [id]);
+        fetchUserRating();
+    }, [id, token]);
+
+    async function handleRatingSubmit() {
+        if (!rating || !id || !token) return;
+    
+        try {
+            const response = await fetch(`${API_BASE_URL}${id}/rate/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Token ${token}`, // ← Upewnij się, że token jest wysyłany
+                },
+                body: JSON.stringify({ rating }),
+            });
+    
+            const responseData = await response.json();
+            console.log("Server response:", responseData);
+    
+            if (response.ok) {
+                setUserRating(rating);
+            } else {
+                console.error("Nie udało się zapisać oceny:", responseData);
+            }
+        } catch (error) {
+            console.error("Błąd sieci:", error);
+        }
+    }
+    
 
     if (!movie) return <p>Ładowanie...</p>;
 
@@ -69,6 +116,23 @@ export default function MovieDetailsPage() {
                 ) : <p>Brak informacji o dostępności</p>}
 
                 <MovieCast movieId={id || ""} />
+
+                {/* System oceniania */}
+                {token ? (
+                    <div className="rating-section">
+                        <h3>Oceń film:</h3>
+                        <select value={rating ?? ""} onChange={(e) => setRating(Number(e.target.value))}>
+                            <option value="" disabled>Wybierz ocenę</option>
+                            {[...Array(10)].map((_, i) => (
+                                <option key={i + 1} value={i + 1}>{i + 1}</option>
+                            ))}
+                        </select>
+                        <button onClick={handleRatingSubmit}>Zapisz ocenę</button>
+                        {userRating && <p>Twoja ocena: {userRating}/10</p>}
+                    </div>
+                ) : (
+                    <p>Zaloguj się, aby ocenić film</p>
+                )}
             </div>
         </div>
     );

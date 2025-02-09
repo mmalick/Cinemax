@@ -8,6 +8,7 @@ from .views import (
     get_movie_credits,
     register_user,
     login_user,
+    rate_movie,
 )
 
 urlpatterns = [
@@ -19,4 +20,6 @@ urlpatterns = [
     path('movies/<int:movie_id>/credits/', get_movie_credits, name='movie-credits'),
     path('register/', register_user, name='register'),
     path('login/', login_user, name='login'),
+    path('movies/<int:movie_id>/rate/', rate_movie, name='rate-movie'),
 ]
+
