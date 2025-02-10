@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar/Navbar";
+import Navbar from "../ReusableUI/Navbar/Navbar";
 import "./AuthScreen.css";
 
 interface AuthProps {

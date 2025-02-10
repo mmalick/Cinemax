@@ -1,9 +1,9 @@
 import "./App.css";
-import Navbar from "./components/Navbar/Navbar";
+import Navbar from "./components/ReusableUI/Navbar/Navbar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import useUserAuth from "./hooks/userAuth";
+import useUserAuth from "./components/Auth/userAuth";
 
-import AuthScreen from "./pages/AuthScreen";
+import AuthScreen from "./components/Auth/AuthScreen";
 import HomePage from "./pages/HomePage";
 import FilmsPage from "./pages/FilmsPage";
 import MovieDetailsPage from "./pages/MovieDetailsPage";

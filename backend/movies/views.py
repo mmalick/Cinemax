@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Rating
 
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
@@ -153,3 +153,24 @@ def rate_movie(request, movie_id):
         )
 
         return Response({"message": "Rating saved", "rating": rating_value})
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def search_movies(request):
+    query = request.GET.get("query", "")
+
+    if len(query) < 2:  # Minimalna długość wyszukiwania
+        return JsonResponse({"results": []})
+
+    url = f"https://api.themoviedb.org/3/search/movie"
+    params = {
+        "api_key": settings.TMDB_API_KEY,
+        "query": query,
+        "language": "pl-PL"
+    }
+
+    response = requests.get(url, params=params)
+    if response.status_code != 200:
+        return JsonResponse({"error": "Błąd pobierania danych"}, status=response.status_code)
+
+    return JsonResponse(response.json())
