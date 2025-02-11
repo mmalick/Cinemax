@@ -1,6 +1,6 @@
 import React from 'react';
-import Navbar from '../components/Navbar/Navbar';
-import MovieSection from '../components/MovieSection/MovieSection';
+import Navbar from '../components/ReusableUI/Navbar/Navbar';
+import MovieSection from '../components/Movie/MovieSection/MovieSection';
 
 const FilmsPage: React.FC = () => {
   return (

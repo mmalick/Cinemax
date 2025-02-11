@@ -1,5 +1,5 @@
 import React from 'react';
-import MovieSection from '../components/MovieSection/MovieSection';
+import MovieSection from '../components/Movie/MovieSection/MovieSection';
 
 const HomePage: React.FC = () => {
   return (

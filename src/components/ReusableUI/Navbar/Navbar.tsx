@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./Navbar.css";
 import Logo from "./Logo";
+import MovieSearch from "../../Movie/MovieSection/MovieSearch"; // Import wyszukiwarki filmów
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
@@ -9,8 +10,7 @@ const Navbar = () => {
 
   useEffect(() => {
     const checkAuth = () => setIsLoggedIn(!!localStorage.getItem("token"));
-
-    window.addEventListener("storage", checkAuth); // Nasłuchiwanie zmian w localStorage
+    window.addEventListener("storage", checkAuth);
     return () => window.removeEventListener("storage", checkAuth);
   }, []);
 
@@ -32,6 +32,9 @@ const Navbar = () => {
           <li><Link to="/lists">Listy</Link></li>
           <li><Link to="/profile">Profil</Link></li>
         </ul>
+      </div>
+      <div className="navbar-middle">
+        <MovieSearch /> {/* Dodajemy nowy komponent wyszukiwarki */}
       </div>
       <div className="navbar-right">
         {isLoggedIn ? (

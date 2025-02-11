@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar/Navbar";
+import Navbar from "../ReusableUI/Navbar/Navbar";
 import "./AuthScreen.css";
 
 interface AuthProps {
@@ -28,8 +28,8 @@ const AuthScreen: React.FC<AuthProps> = ({ isSignUp = false }) => {
     setMessage("");
 
     const userData = isSignUp
-      ? { username, email, password } // Rejestracja wymaga emaila
-      : { username, password }; // Logowanie - UPEWNIJ SIĘ, CZY BACKEND NIE WYMAGA EMAILA
+      ? { username, email, password } 
+      : { username, password };
 
     try {
       const response = await fetch(
@@ -54,9 +54,9 @@ const AuthScreen: React.FC<AuthProps> = ({ isSignUp = false }) => {
       } else {
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", data.username);
-        localStorage.setItem("loginTime", Date.now().toString()); // Zapisywanie czasu logowania
-        window.dispatchEvent(new Event("storage")); // 🔥 Wysyła event do Navbar
-        navigate("/"); // Przekierowanie do strony głównej po zalogowaniu
+        localStorage.setItem("loginTime", Date.now().toString());
+        window.dispatchEvent(new Event("storage")); 
+        navigate("/"); 
       }
     } catch (error: any) {
       setError(error.message);
@@ -72,7 +72,6 @@ const AuthScreen: React.FC<AuthProps> = ({ isSignUp = false }) => {
           {error && <p className="error-message">{error}</p>}
           {message && <p className="success-message">{message}</p>}
           <form onSubmit={handleSubmit}>
-            {/* Pole username zarówno dla rejestracji, jak i logowania */}
             <input
               type="text"
               placeholder="Username"
@@ -81,7 +80,6 @@ const AuthScreen: React.FC<AuthProps> = ({ isSignUp = false }) => {
               className="input-box"
               required
             />
-            {/* Email tylko podczas rejestracji */}
             {isSignUp && (
               <input
                 type="email"

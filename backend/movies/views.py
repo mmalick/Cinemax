@@ -2,19 +2,21 @@ import requests
 from django.http import JsonResponse
 from django.conf import settings
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from django.contrib.auth.hashers import make_password
+from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from .models import Rating
 
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 User = get_user_model()
 
 @api_view(['GET'])
 def get_popular_movies(request):
-    url = f"{TMDB_BASE_URL}/movie/popular?api_key={settings.TMDB_API_KEY}&language=en-US&page=1"
+    page = request.GET.get("page", 1)
+    url = f"{TMDB_BASE_URL}/movie/popular?api_key={settings.TMDB_API_KEY}&language=en-US&page={page}"
     response = requests.get(url)
     if response.status_code == 200:
         return Response(response.json())
@@ -22,7 +24,8 @@ def get_popular_movies(request):
 
 @api_view(['GET'])
 def get_upcoming_movies(request):
-    url = f"{TMDB_BASE_URL}/movie/upcoming?api_key={settings.TMDB_API_KEY}&language=en-US&page=1"
+    page = request.GET.get("page", 1)
+    url = f"{TMDB_BASE_URL}/movie/upcoming?api_key={settings.TMDB_API_KEY}&language=en-US&page={page}"
     response = requests.get(url)
     if response.status_code == 200:
         return Response(response.json())
@@ -30,7 +33,8 @@ def get_upcoming_movies(request):
 
 @api_view(['GET'])
 def get_now_playing_movies(request):
-    url = f"{TMDB_BASE_URL}/movie/now_playing?api_key={settings.TMDB_API_KEY}&language=en-US&page=1"
+    page = request.GET.get("page", 1)
+    url = f"{TMDB_BASE_URL}/movie/now_playing?api_key={settings.TMDB_API_KEY}&language=en-US&page={page}"
     response = requests.get(url)
     if response.status_code == 200:
         return Response(response.json())
@@ -41,15 +45,12 @@ def get_top_rated_movies(request):
     page = request.GET.get("page", 1)
     url = f"{TMDB_BASE_URL}/movie/top_rated?api_key={settings.TMDB_API_KEY}&language=en-US&page={page}"
     response = requests.get(url)
-    
     if response.status_code == 200:
         return Response(response.json())
     return Response({"error": "Failed to fetch movies"}, status=response.status_code)
 
-
 @api_view(['GET'])
 def get_movie_details(request, movie_id):
-    # Pobieranie podstawowych informacji o filmie
     movie_url = f"{TMDB_BASE_URL}/movie/{movie_id}?api_key={settings.TMDB_API_KEY}&language=pl-PL"
     providers_url = f"{TMDB_BASE_URL}/movie/{movie_id}/watch/providers?api_key={settings.TMDB_API_KEY}"
 
@@ -62,10 +63,8 @@ def get_movie_details(request, movie_id):
     movie_data = movie_response.json()
     providers_data = providers_response.json()
 
-    # Pobieranie listy platform streamingowych dostępnych w Polsce
     providers = providers_data.get("results", {}).get("PL", {}).get("flatrate", [])
 
-    # Tworzenie odpowiedzi JSON
     return JsonResponse({
         "title": movie_data.get("title"),
         "overview": movie_data.get("overview"),
@@ -111,10 +110,10 @@ def register_user(request):
     if User.objects.filter(email=data['email']).exists():
         return Response({'detail': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-    user = User.objects.create(
+    user = User.objects.create_user(  # ✅ Zmienione na create_user
         username=data['username'],
         email=data['email'],
-        password=make_password(data['password'])
+        password=data['password']
     )
 
     return Response({'detail': 'User created successfully'}, status=status.HTTP_201_CREATED)
@@ -129,3 +128,49 @@ def login_user(request):
         return Response({'token': token.key, 'username': user.username}, status=status.HTTP_200_OK)
     else:
         return Response({'detail': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def rate_movie(request, movie_id):
+    if request.method == 'GET':
+        try:
+            rating = Rating.objects.get(user=request.user, movie_id=str(movie_id))
+            return Response({"rating": rating.rating}, status=status.HTTP_200_OK)
+        except Rating.DoesNotExist:
+            return Response({"rating": None}, status=status.HTTP_200_OK)
+
+    elif request.method == 'POST':
+        data = request.data
+        rating_value = data.get("rating")
+
+        if not rating_value or not (1 <= rating_value <= 10):
+            return Response({"error": "Invalid rating"}, status=status.HTTP_400_BAD_REQUEST)
+
+        rating, created = Rating.objects.update_or_create(
+            user=request.user,
+            movie_id=str(movie_id),
+            defaults={"rating": rating_value}
+        )
+
+        return Response({"message": "Rating saved", "rating": rating_value})
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def search_movies(request):
+    query = request.GET.get("query", "")
+
+    if len(query) < 2:  # Minimalna długość wyszukiwania
+        return JsonResponse({"results": []})
+
+    url = f"https://api.themoviedb.org/3/search/movie"
+    params = {
+        "api_key": settings.TMDB_API_KEY,
+        "query": query,
+        "language": "pl-PL"
+    }
+
+    response = requests.get(url, params=params)
+    if response.status_code != 200:
+        return JsonResponse({"error": "Błąd pobierania danych"}, status=response.status_code)
+
+    return JsonResponse(response.json())
