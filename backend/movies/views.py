@@ -1,6 +1,7 @@
 import requests
 from django.http import JsonResponse
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import get_user_model
@@ -8,7 +9,9 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Rating
+from .models import Rating, MovieList
+from .serializers import MovieListSerializer
+from movies.models import Movie
 
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 User = get_user_model()
@@ -49,6 +52,7 @@ def get_top_rated_movies(request):
         return Response(response.json())
     return Response({"error": "Failed to fetch movies"}, status=response.status_code)
 
+
 @api_view(['GET'])
 def get_movie_details(request, movie_id):
     movie_url = f"{TMDB_BASE_URL}/movie/{movie_id}?api_key={settings.TMDB_API_KEY}&language=pl-PL"
@@ -66,6 +70,7 @@ def get_movie_details(request, movie_id):
     providers = providers_data.get("results", {}).get("PL", {}).get("flatrate", [])
 
     return JsonResponse({
+        "id": movie_data.get("id"),  # 👈 DODANE – teraz frontend otrzyma poprawne ID!
         "title": movie_data.get("title"),
         "overview": movie_data.get("overview"),
         "poster_path": movie_data.get("poster_path"),
@@ -174,3 +179,82 @@ def search_movies(request):
         return JsonResponse({"error": "Błąd pobierania danych"}, status=response.status_code)
 
     return JsonResponse(response.json())
+
+# ✅ Pobieranie list użytkownika
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_movie_lists(request):
+    print(f"Użytkownik: {request.user}")  # ✅ Debugowanie użytkownika
+
+    if not request.user.is_authenticated:
+        return Response({"error": "Brak autoryzacji"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    lists = MovieList.objects.filter(user=request.user)
+    serializer = MovieListSerializer(lists, many=True)
+    return Response(serializer.data)
+
+# ✅ Tworzenie nowej listy
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_movie_list(request):
+    name = request.data.get("name")
+    if not name:
+        return Response({"error": "Brak nazwy listy"}, status=status.HTTP_400_BAD_REQUEST)
+
+    movie_list = MovieList.objects.create(user=request.user, name=name)
+    return Response({"id": movie_list.id, "name": movie_list.name}, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_movie_to_list(request, list_id):
+    print(f"Użytkownik: {request.user}")  # ✅ Debugowanie użytkownika
+
+    if not request.user.is_authenticated:
+        return Response({"error": "Użytkownik niezalogowany"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    movie_list = get_object_or_404(MovieList, id=list_id, user=request.user)
+
+    movie_id = request.data.get("movie_id")
+    if not movie_id:
+        return Response({"error": "Brak ID filmu"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Jeśli film już jest na liście, nie dodawaj ponownie
+    if movie_id in movie_list.movie_ids:
+        return Response({"message": "Film już znajduje się na liście"}, status=status.HTTP_200_OK)
+
+    # Dodajemy ID filmu do listy
+    movie_list.movie_ids.append(movie_id)
+    movie_list.save()
+
+    return Response({"message": "Film dodany do listy"}, status=status.HTTP_200_OK)
+
+
+# ✅ Usuwanie filmu z listy
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_movie_from_list(request, list_id, movie_id):
+    print(f"Użytkownik: {request.user}")  # ✅ Debugowanie użytkownika
+
+    movie_list = get_object_or_404(MovieList, id=list_id, user=request.user)
+
+    movie = get_object_or_404(Movie, id=movie_id)
+    movie_list.movies.remove(movie)
+
+    return Response({"message": "Film usunięty z listy"}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_movie_list_details(request, list_id):
+    movie_list = get_object_or_404(MovieList, id=list_id, user=request.user)
+
+    # ✅ Pobieramy `movie_ids` zamiast `movies`
+    movie_ids = movie_list.movie_ids if isinstance(movie_list.movie_ids, list) else []
+
+    return Response({
+        "id": movie_list.id,
+        "name": movie_list.name,
+        "movie_ids": movie_ids,  # Zmieniamy z "movies" na "movie_ids"
+    }, status=status.HTTP_200_OK)
+
+
+

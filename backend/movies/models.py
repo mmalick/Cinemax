@@ -3,9 +3,10 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 
 class Movie(models.Model):
+    id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=255)
     description = models.TextField()
-    release_date = models.DateField()
+    release_date = models.DateField(null=True, blank=True)
     poster_url = models.URLField()
 
     def __str__(self):
@@ -29,3 +30,14 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+from django.db import models
+from django.conf import settings
+
+class MovieList(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    movie_ids = models.JSONField(default=list, blank=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.user.username}"

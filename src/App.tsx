@@ -7,6 +7,8 @@ import AuthScreen from "./components/Auth/AuthScreen";
 import HomePage from "./pages/HomePage";
 import FilmsPage from "./pages/FilmsPage";
 import MovieDetailsPage from "./pages/MovieDetailsPage";
+import ListsPage from "./pages/ListsPage";
+import ListDetailsPage from "./pages/ListDetailsPage";
 
 const App: React.FC = () => {
   return (
@@ -19,7 +21,9 @@ const App: React.FC = () => {
         <Route path="/login" element={<AuthScreen />} />
         <Route path="/signup" element={<AuthScreen isSignUp />} />
         <Route path="/films" element={<FilmsPage />} />
+        <Route path="/lists" element={<ListsPage/>} />
         <Route path="/movie/:id" element={<MovieDetailsPage />} />
+        <Route path="/list/:id" element={<ListDetailsPage />} />
       </Routes>
     </Router>
   );

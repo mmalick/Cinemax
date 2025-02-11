@@ -10,6 +10,11 @@ from .views import (
     login_user,
     rate_movie,
     search_movies,
+    get_movie_lists,
+    create_movie_list,
+    add_movie_to_list,
+    remove_movie_from_list,
+    get_movie_list_details,
 )
 
 urlpatterns = [
@@ -23,6 +28,10 @@ urlpatterns = [
     path('login/', login_user, name='login'),
     path('movies/<int:movie_id>/rate/', rate_movie, name='rate-movie'),
     path('search-movies/', search_movies, name='search-movies'),
-
+    path("lists/", get_movie_lists, name="get-movie-lists"),
+    path("lists/<int:list_id>/", get_movie_list_details, name="get-movie-list-details"),  # Endpoint dla szczegółów listy
+    path("lists/create/", create_movie_list, name="create-movie-list"),
+    path("lists/<int:list_id>/add/", add_movie_to_list, name="add-movie-to-list"),
+    path("lists/<int:list_id>/remove/<int:movie_id>/", remove_movie_from_list, name="remove-movie-from-list"),
 ]
 

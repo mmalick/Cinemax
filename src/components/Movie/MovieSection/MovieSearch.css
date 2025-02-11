@@ -3,8 +3,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    max-width: 350px; /* Szerszy searchbar */
+    width: 120%;
+    max-width: 500px; /* Szerszy searchbar */
   }
   
   .search-input {
