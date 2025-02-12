@@ -65,13 +65,13 @@
   }
   
   .signup-btn {
-    background-color: #3182ce;
+    background-color: #ff1a1a;
     color: #fff;
     margin-right: 35px;
   }
   
   .signup-btn:hover {
-    background-color: #2b6cb0;
+    background-color: #e61111d0;
   }
   .logout-btn{
     padding: 10px 10px;

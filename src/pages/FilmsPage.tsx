@@ -6,7 +6,7 @@ const FilmsPage: React.FC = () => {
   return (
     <div className="films-page">
       <Navbar />
-      <MovieSection title="Top Rated" category="top_rated" viewType="grid" showLoadMore={true} />
+      <MovieSection title="Najwyżej oceniane" category="top_rated" viewType="grid" showLoadMore={true} />
     </div>
   );
 };

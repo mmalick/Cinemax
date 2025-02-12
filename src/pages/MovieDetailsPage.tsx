@@ -188,7 +188,7 @@ export default function MovieDetailsPage() {
         <h1>{movie.title}</h1>
         <p>{movie.overview}</p>
         <div className="rating">
-          <p>⭐ {movie.vote_average.toFixed(1)} ({movie.vote_count} głosów)</p>
+          <p>Oceny TMDB: ⭐ {movie.vote_average.toFixed(1)} ({movie.vote_count} głosów)</p>
           <MovieRatings movieId={id ?? ""} initialRating={userRating} />
         </div>
         <div className="movie-cast">

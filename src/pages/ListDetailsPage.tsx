@@ -19,7 +19,7 @@ interface MovieList {
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 const ListDetailsPage = () => {
-  const { id } = useParams<{ id?: string }>(); // 🔥 Obsługa ID jako string
+  const { id } = useParams<{ id?: string }>(); // Obsługa ID jako string
   const navigate = useNavigate();
   const [list, setList] = useState<MovieList | null>(null);
   const [movies, setMovies] = useState<Film[]>([]);
@@ -160,16 +160,19 @@ const ListDetailsPage = () => {
       ) : error ? (
         <p className="error-message">{error}</p>
       ) : list ? (
-        <>
-          <h1>{list.name}</h1>
-          <button className="delete-list-btn" onClick={deleteList}>Usuń listę</button>
-          {movies.length > 0 ? (
-  <FilmGrid films={movies} removeMovie={removeMovie} />  // 🔥 Tylko tutaj przekazujemy removeMovie
-) : (
-  <p>Brak filmów w tej liście.</p>
-)}
+        <div className="list-container">
+          {/* 🔥 Poprawiona sekcja nagłówka */}
+          <div className="list-header">
+            <h1 className="list-title">{list.name}</h1>
+            <button className="delete-list-btn" onClick={deleteList}>Usuń listę</button>
+          </div>
 
-        </>
+          {movies.length > 0 ? (
+            <FilmGrid films={movies} removeMovie={removeMovie} />
+          ) : (
+            <p className="empty-list-message">Brak filmów w tej liście.</p>
+          )}
+        </div>
       ) : (
         <p>Nie znaleziono listy.</p>
       )}

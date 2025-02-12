@@ -5,108 +5,162 @@
   background-color: #181818;
   color: white;
   padding: 20px;
-  min-height: 100vh;
+  min-height: auto;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-h2 {
-  font-size: 28px;
-  margin-bottom: 20px;
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 850px; /* Większa szerokość dla lepszego rozmieszczenia */
+  margin-top: 35px; /* Przesuwa całość niżej */
+  padding: 30px 20px; /* Większy padding dla lepszego odstępu */
+}
+
+.list-title {
+  font-size: 32px;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 2px;
   font-weight: bold;
-  text-align: center;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+  display: inline-block;
+  padding-bottom: 5px;
+  margin: 0;
+  margin-left: 20px; /* Przesunięcie w prawo */
 }
 
-/* 🔥 Wyśrodkowany przycisk usuwania listy */
 .delete-list-btn {
-  background-color: red;
+  background: linear-gradient(135deg, #ff1a1a, #cc0000);
   color: white;
   border: none;
-  padding: 12px 18px;
+  padding: 14px 22px; /* Powiększenie przycisku */
   border-radius: 8px;
   cursor: pointer;
-  margin-bottom: 20px;
-  align-self: center;
-  text-align: center;
   font-size: 16px;
   font-weight: bold;
-  transition: background-color 0.2s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 8px rgba(255, 26, 26, 0.3);
+  margin-right: 20px; /* Przesunięcie w prawo */
+  margin-top: 10px; /* Przesunięcie w dół */
 }
 
 .delete-list-btn:hover {
-  background-color: darkred;
+  background: linear-gradient(135deg, #cc0000, #990000);
+  box-shadow: 0 6px 12px rgba(255, 0, 0, 0.5);
+  transform: scale(1.05);
 }
 
-/* 🔥 Poprawiony grid filmów */
+
+
+/* Stylizacja siatki filmów */
 .movie-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Większe kafelki */
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 20px;
   width: 100%;
-  max-width: 1000px; /* Możesz dopasować do szerokości strony */
+  max-width: 1000px;
   justify-content: center;
 }
 
-/* 🔥 Styl kafelków filmów */
+/* Stylizacja pojedynczego filmu */
 .movie-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   background-color: #222;
   padding: 10px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
   position: relative;
   width: 180px;
-  transition: transform 0.2s ease-in-out;
+  transition: transform 0.3s ease-in-out;
 }
 
 .movie-item:hover {
   transform: scale(1.05);
 }
 
-/* 🔥 Większe obrazki filmów + poprawiona proporcja */
 .movie-item img {
   width: 100%;
-  height: 270px; /* Powiększone */
+  height: 270px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
-/* 🔥 Poprawiony przycisk usuwania filmu - teraz w rogu */
+/* Stylizacja przycisku usuwania filmu */
 .remove-movie-btn {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  background-color: rgba(255, 0, 0, 0.8);
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, #ff1a1a, #cc0000);
   color: white;
   border: none;
   padding: 6px;
   border-radius: 50%;
   font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out, opacity 0.2s;
+  transition: all 0.3s ease-in-out;
   opacity: 0;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  line-height: 1;
+  box-shadow: 0 2px 6px rgba(255, 26, 26, 0.3);
 }
 
-/* 🔥 Przycisk usuwania pojawia się po najechaniu */
 .movie-item:hover .remove-movie-btn {
   opacity: 1;
 }
 
-/* 🔥 Efekt hover */
 .remove-movie-btn:hover {
-  background-color: rgba(255, 0, 0, 1);
+  background: linear-gradient(135deg, #cc0000, #990000);
+  box-shadow: 0 4px 10px rgba(255, 0, 0, 0.5);
+  transform: scale(1.1);
 }
 
-/* 🔥 Ikona X zamiast tekstu */
 .remove-movie-btn::after {
   content: "✖";
-  font-size: 16px;
+  font-size: 20px;
   font-weight: bold;
+}
+
+/* Poprawiona responsywność */
+@media (max-width: 768px) {
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .movie-item {
+    width: 140px;
+  }
+
+  .movie-item img {
+    height: 200px;
+  }
+
+  .remove-movie-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+}
+
+/* Stylizacja pustej listy */
+.empty-list-message {
+  font-size: 18px;
+  color: #aaa;
+  margin-top: 20px;
+  text-align: center;
 }

@@ -68,13 +68,13 @@ const AuthScreen: React.FC<AuthProps> = ({ isSignUp = false }) => {
       <Navbar />
       <div className="auth-container">
         <div className="auth-box">
-          <h2>{isSignUp ? "Sign Up" : "Login"}</h2>
+          <h2>{isSignUp ? "Rejestracja" : "Logowanie"}</h2>
           {error && <p className="error-message">{error}</p>}
           {message && <p className="success-message">{message}</p>}
           <form onSubmit={handleSubmit}>
             <input
               type="text"
-              placeholder="Username"
+              placeholder="Nazwa użytkownika"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="input-box"
@@ -92,7 +92,7 @@ const AuthScreen: React.FC<AuthProps> = ({ isSignUp = false }) => {
             )}
             <input
               type="password"
-              placeholder="Password"
+              placeholder="Hasło"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="input-box"
@@ -101,7 +101,7 @@ const AuthScreen: React.FC<AuthProps> = ({ isSignUp = false }) => {
             {isSignUp && (
               <input
                 type="password"
-                placeholder="Confirm Password"
+                placeholder="Powtórz hasło"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="input-box"
@@ -109,13 +109,13 @@ const AuthScreen: React.FC<AuthProps> = ({ isSignUp = false }) => {
               />
             )}
             <button type="submit" className="submit-button">
-              {isSignUp ? "Sign Up" : "Login"}
+              {isSignUp ? "Zarejestruj się" : "Zaloguj się"}
             </button>
           </form>
           <p className="footer-text">
-            {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+            {isSignUp ? "Posiadasz konto?" : "Nie posiadasz konta?"}{" "}
             <Link to={isSignUp ? "/login" : "/signup"} className="link-text">
-              {isSignUp ? "Login" : "Sign Up"}
+              {isSignUp ? "Zaloguj się" : "Zarejestruj się"}
             </Link>
           </p>
         </div>

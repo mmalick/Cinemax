@@ -9,7 +9,7 @@ interface MovieSelectionProps {
   showLoadMore?: boolean;
 }
 
-const MovieSelection: React.FC<MovieSelectionProps> = ({ category, viewType, showLoadMore = false }) => {
+const MovieSelection: React.FC<MovieSelectionProps> = ({ title, category, viewType, showLoadMore = false }) => {
   const [films, setFilms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -47,7 +47,24 @@ const MovieSelection: React.FC<MovieSelectionProps> = ({ category, viewType, sho
   };
 
   return (
-    <div>
+    <div style={{ margin: "40px 0", padding: "20px", textAlign: "center" }}>
+<h2
+  style={{
+    fontSize: "32px",
+    color: "white",
+    marginBottom: "30px",
+    textAlign: "center",
+    textTransform: "uppercase",
+    letterSpacing: "2px",
+    fontWeight: "bold",
+    borderBottom: "3px solid rgba(255, 255, 255, 0.3)",
+    display: "inline-block",
+    paddingBottom: "5px",
+  }}
+>
+  {title}
+</h2>
+
       {loading ? <p>Ładowanie...</p> : viewType === 'list' ? <FilmList films={films} /> : <FilmGrid films={films} />}
       {showLoadMore && hasMore && (
         <button onClick={loadMoreMovies} className="load-more">

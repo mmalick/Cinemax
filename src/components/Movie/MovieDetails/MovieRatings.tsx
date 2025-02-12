@@ -7,17 +7,17 @@ interface MovieRatingsProps {
 }
 
 const MovieRatings: React.FC<MovieRatingsProps> = ({ movieId,initialRating = null }) => {
-  const [rating, setRating] = useState<number>(initialRating ?? 0); // Domyślnie 0
+  const [rating, setRating] = useState<number>(initialRating ?? 0);
   const [hover, setHover] = useState<number | null>(null);
 
   useEffect(() => {
-    setRating(initialRating ?? 0); // Ustawienie wartości początkowej
+    setRating(initialRating ?? 0);
   }, [initialRating]);
 
   const handleRating = async (userRating: number) => {
     setRating(userRating);
 
-    const token = localStorage.getItem("token"); // Pobierz token JWT
+    const token = localStorage.getItem("token");
     if (!token) {
       console.error("Brak tokena użytkownika.");
       return;
@@ -53,7 +53,7 @@ const MovieRatings: React.FC<MovieRatingsProps> = ({ movieId,initialRating = nul
                   transition: "transform 0.2s",
                 }}
               >
-                {starValue <= (hover ?? rating) ? "⭐" : "★"} {/* Złota lub czarna gwiazdka */}
+                {starValue <= (hover ?? rating) ? "⭐" : "★"}
               </span>
             );
           })}
