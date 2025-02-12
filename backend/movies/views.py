@@ -130,13 +130,18 @@ def register_user(request):
     if User.objects.filter(email=data['email']).exists():
         return Response({'detail': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-    user = User.objects.create_user(  # ✅ Zmienione na create_user
+    user = User.objects.create_user(
         username=data['username'],
         email=data['email'],
         password=data['password']
     )
 
+    # ✅ Tworzenie domyślnych list po rejestracji
+    MovieList.objects.create(user=user, name="Ocenione Filmy", is_default=True)
+    MovieList.objects.create(user=user, name="Do obejrzenia", is_default=True)
+
     return Response({'detail': 'User created successfully'}, status=status.HTTP_201_CREATED)
+
 
 @api_view(['POST'])
 def login_user(request):
@@ -172,7 +177,15 @@ def rate_movie(request, movie_id):
             defaults={"rating": rating_value}
         )
 
+        # ✅ Dodajemy film do listy „Ocenione Filmy”
+        rated_list, _ = MovieList.objects.get_or_create(user=request.user, name="Ocenione Filmy", is_default=True)
+
+        if str(movie_id) not in rated_list.movie_ids:
+            rated_list.movie_ids.append(str(movie_id))
+            rated_list.save()
+
         return Response({"message": "Rating saved", "rating": rating_value})
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -264,8 +277,13 @@ def get_movie_list_details(request, list_id):
 @permission_classes([IsAuthenticated])
 def delete_movie_list(request, list_id):
     movie_list = get_object_or_404(MovieList, id=list_id, user=request.user)
+
+    if movie_list.is_default:
+        return Response({"error": "Nie można usunąć domyślnej listy"}, status=status.HTTP_400_BAD_REQUEST)
+
     movie_list.delete()
     return Response({"message": "Lista filmów została usunięta"}, status=status.HTTP_200_OK)
+
 
 
 @api_view(['DELETE'])

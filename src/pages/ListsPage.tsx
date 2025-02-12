@@ -127,9 +127,8 @@ const ListsPage = () => {
   };
 
   const handleListClick = (listId: number) => {
-    navigate(`/list/${listId}`); // 🔥 Poprawione!
-  }
-
+    navigate(`/list/${listId}`);
+  };
 
   return (
     <div className="lists-page">
@@ -159,9 +158,9 @@ const ListsPage = () => {
                   ))}
                 </div>
               </div>
-              <button className="delete-list-btn" onClick={() => deleteList(list.id)}>
-                Usuń listę
-              </button>
+              {!["Ocenione Filmy", "Do obejrzenia"].includes(list.name) && (
+                <button className="delete-list-btn" onClick={() => deleteList(list.id)}></button>
+              )}
             </div>
           ))
         ) : (

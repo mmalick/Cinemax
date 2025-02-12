@@ -159,3 +159,25 @@
     padding: 1rem;     
     margin: 1rem 0;
   }
+  .notification {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(247, 20, 20, 0.9);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(255, 0, 0, 0.3);
+    animation: fadeOut 3s ease-in-out forwards;
+  }
+  
+  @keyframes fadeOut {
+    0% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  
+  

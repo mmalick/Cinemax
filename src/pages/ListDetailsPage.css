@@ -37,15 +37,14 @@
   background: linear-gradient(135deg, #ff1a1a, #cc0000);
   color: white;
   border: none;
-  padding: 14px 22px; /* Powiększenie przycisku */
+  padding: 12px 18px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
   font-weight: bold;
   transition: all 0.3s ease-in-out;
   box-shadow: 0 4px 8px rgba(255, 26, 26, 0.3);
-  margin-right: 20px; /* Przesunięcie w prawo */
-  margin-top: 10px; /* Przesunięcie w dół */
+  margin-top: 20px;
 }
 
 .delete-list-btn:hover {
@@ -56,15 +55,7 @@
 
 
 
-/* Stylizacja siatki filmów */
-.movie-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
-  width: 100%;
-  max-width: 1000px;
-  justify-content: center;
-}
+
 
 /* Stylizacja pojedynczego filmu */
 .movie-item {
@@ -96,31 +87,25 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background: linear-gradient(135deg, #ff1a1a, #cc0000);
-  color: white;
+  background: rgba(255, 255, 255, 0.1); /* Lekko widoczne tło */
+  color: white !important;
   border: none;
   padding: 6px;
   border-radius: 50%;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
-  opacity: 0;
   width: 36px;
   height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  box-shadow: 0 2px 6px rgba(255, 26, 26, 0.3);
-}
-
-.movie-item:hover .remove-movie-btn {
-  opacity: 1;
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.3);
 }
 
 .remove-movie-btn:hover {
-  background: linear-gradient(135deg, #cc0000, #990000);
-  box-shadow: 0 4px 10px rgba(255, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.5);
   transform: scale(1.1);
 }
 
@@ -129,6 +114,13 @@
   font-size: 20px;
   font-weight: bold;
 }
+
+
+.movie-item:hover .remove-movie-btn {
+  opacity: 1;
+}
+
+
 
 /* Poprawiona responsywność */
 @media (max-width: 768px) {

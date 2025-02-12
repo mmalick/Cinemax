@@ -19,7 +19,7 @@ interface MovieList {
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 const ListDetailsPage = () => {
-  const { id } = useParams<{ id?: string }>(); // Obsługa ID jako string
+  const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const [list, setList] = useState<MovieList | null>(null);
   const [movies, setMovies] = useState<Film[]>([]);
@@ -27,7 +27,6 @@ const ListDetailsPage = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    console.log("🔍 Otrzymane ID z URL:", id);
     if (id) {
       fetchListDetails(Number(id));
     } else {
@@ -38,13 +37,10 @@ const ListDetailsPage = () => {
 
   const fetchMovieDetails = async (movieId: number) => {
     try {
-      console.log(`ℹ️ Pobieranie filmu ${movieId}`);
       const response = await fetch(`${API_BASE_URL}/movies/${movieId}/`);
       if (!response.ok) throw new Error(`Błąd pobierania filmu ${movieId}`);
 
       const movieData = await response.json();
-      console.log(`🎬 Odebrane dane filmu ${movieId}:`, movieData);
-
       return {
         ...movieData,
         poster_path: movieData.poster_path?.startsWith("http")
@@ -52,7 +48,7 @@ const ListDetailsPage = () => {
           : `https://image.tmdb.org/t/p/w500${movieData.poster_path}`,
       };
     } catch (error) {
-      console.error(`🚨 Błąd pobierania filmu ${movieId}:`, error);
+      console.error(`Błąd pobierania filmu ${movieId}:`, error);
       return null;
     }
   };
@@ -61,14 +57,12 @@ const ListDetailsPage = () => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      console.error("❌ Brak tokena, użytkownik niezalogowany");
       setError("Musisz być zalogowany, aby zobaczyć tę listę.");
       setLoading(false);
       return;
     }
 
     try {
-      console.log(`🛰️ Pobieram listę z: ${API_BASE_URL}/lists/${listId}/`);
       const response = await fetch(`${API_BASE_URL}/lists/${listId}/`, {
         method: "GET",
         headers: {
@@ -77,21 +71,9 @@ const ListDetailsPage = () => {
         },
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Błąd ${response.status}: ${errorText}`);
-      }
+      if (!response.ok) throw new Error(`Błąd ${response.status}`);
 
       const data: MovieList = await response.json();
-      console.log("📜 Odebrane dane listy:", data);
-
-      if (!data.movie_ids || !Array.isArray(data.movie_ids)) {
-        console.error("⚠️ Brak `movie_ids` w odpowiedzi API");
-        setMovies([]);
-        setLoading(false);
-        return;
-      }
-
       setList(data);
 
       const movieDetails = await Promise.all(
@@ -100,7 +82,7 @@ const ListDetailsPage = () => {
 
       setMovies(movieDetails.filter((movie) => movie !== null));
     } catch (error) {
-      console.error("❌ Błąd pobierania listy:", error);
+      console.error("Błąd pobierania listy:", error);
       setError("Nie udało się załadować listy.");
     } finally {
       setLoading(false);
@@ -109,10 +91,9 @@ const ListDetailsPage = () => {
 
   const removeMovie = async (movieId: number) => {
     const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token || list?.name === "Ocenione Filmy") return; // ❌ Nie można usuwać z "Ocenione Filmy"
 
     try {
-      console.log(`🗑️ Usuwam film ${movieId} z listy ${id}`);
       const response = await fetch(`${API_BASE_URL}/lists/${id}/remove/${movieId}/`, {
         method: "DELETE",
         headers: {
@@ -125,7 +106,7 @@ const ListDetailsPage = () => {
 
       setMovies(movies.filter((movie) => movie.id !== movieId));
     } catch (err) {
-      console.error("🚨 Błąd usuwania filmu:", err);
+      console.error("Błąd usuwania filmu:", err);
     }
   };
 
@@ -136,7 +117,6 @@ const ListDetailsPage = () => {
     if (!token) return;
 
     try {
-      console.log(`🗑️ Usuwam listę ${id}`);
       const response = await fetch(`${API_BASE_URL}/lists/${id}/delete/`, {
         method: "DELETE",
         headers: {
@@ -149,7 +129,7 @@ const ListDetailsPage = () => {
 
       navigate("/lists");
     } catch (err) {
-      console.error("🚨 Błąd usuwania listy:", err);
+      console.error("Błąd usuwania listy:", err);
     }
   };
 
@@ -161,16 +141,20 @@ const ListDetailsPage = () => {
         <p className="error-message">{error}</p>
       ) : list ? (
         <div className="list-container">
-          {/* 🔥 Poprawiona sekcja nagłówka */}
           <div className="list-header">
             <h1 className="list-title">{list.name}</h1>
-            <button className="delete-list-btn" onClick={deleteList}>Usuń listę</button>
+            {!["Ocenione Filmy", "Do obejrzenia"].includes(list.name) && (
+              <button className="delete-list-btn" onClick={deleteList}>Usuń listę</button>
+            )}
           </div>
 
           {movies.length > 0 ? (
-            <FilmGrid films={movies} removeMovie={removeMovie} />
+            <FilmGrid
+              films={movies}
+              removeMovie={list.name !== "Ocenione Filmy" ? removeMovie : undefined} // 🔥 Ukrycie usuwania dla "Ocenione Filmy"
+            />
           ) : (
-            <p className="empty-list-message">Brak filmów w tej liście.</p>
+            <p className="empty-list-message">Lista jest pusta</p>
           )}
         </div>
       ) : (

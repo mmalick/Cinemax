@@ -37,7 +37,9 @@ class MovieList(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="movie_lists")
     name = models.CharField(max_length=255)
     movie_ids = models.JSONField(default=list, blank=True) 
+    is_default = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name} - {self.user.username}"
+
 

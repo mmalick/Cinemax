@@ -34,6 +34,7 @@ export default function MovieDetailsPage() {
   const [lists, setLists] = useState<MovieList[]>([]);
   const [newListName, setNewListName] = useState("");
   const [selectedListId, setSelectedListId] = useState<number | null>(null);
+  const [notification, setNotification] = useState<string | null>(null);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -94,6 +95,11 @@ export default function MovieDetailsPage() {
     }
   };
 
+  const showNotification = (message: string) => {
+    setNotification(message);
+    setTimeout(() => setNotification(null), 3000);
+  };
+
   const handleAddMovieToList = async () => {
     if (!token || !selectedListId || !movie?.id) return;
 
@@ -114,14 +120,15 @@ export default function MovieDetailsPage() {
         throw new Error(`Błąd API: ${response.status} ${response.statusText}`);
       }
 
-      console.log(`Film ${movie.title} dodany do listy ${selectedListId}`);
+      showNotification(` Film "${movie.title}" dodany do listy!`);
     } catch (error) {
+      showNotification("Błąd dodawania filmu. Spróbuj ponownie.");
       console.error("Błąd dodawania filmu:", error);
     }
   };
 
   const createNewList = async () => {
-    if (!token || !newListName.trim()) return;
+    if (!token || !newListName.trim() || !movie?.id) return;
 
     try {
       const response = await fetch("http://127.0.0.1:8000/api/lists/create/", {
@@ -134,10 +141,25 @@ export default function MovieDetailsPage() {
       });
 
       if (response.ok) {
+        const createdList = await response.json();
         setNewListName("");
         fetchLists();
+
+        showNotification(`✅ Lista "${createdList.name}" została utworzona!`);
+
+        await fetch(`http://127.0.0.1:8000/api/lists/${createdList.id}/add/`, {
+          method: "POST",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ movie_id: movie.id }),
+        });
+
+        showNotification(`🎬 Film "${movie.title}" dodany do nowej listy!`);
       }
     } catch (error) {
+      showNotification("❌ Błąd tworzenia listy.");
       console.error("Błąd tworzenia listy:", error);
     }
   };
@@ -147,6 +169,8 @@ export default function MovieDetailsPage() {
 
   return (
     <div className="movie-details">
+      {notification && <div className="notification">{notification}</div>}
+
       <div className="movie-left">
         <img
           src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -168,20 +192,24 @@ export default function MovieDetailsPage() {
         ) : (
           <p className="no-streaming">Brak informacji o dostępności</p>
         )}
+{notification && <div className="notification">{notification}</div>}
 
-        <div className="list-management">
-          <h3>Zarządzanie listami:</h3>
-          <select onChange={(e) => setSelectedListId(Number(e.target.value))} value={selectedListId ?? ""}>
-            <option value="">Wybierz listę</option>
-            {lists.map((list) => (
-              <option key={list.id} value={list.id}>{list.name}</option>
-            ))}
-          </select>
-          <button onClick={handleAddMovieToList} disabled={!selectedListId}>Dodaj do listy</button>
+<div className="list-management">
+  <h3>Zarządzanie listami:</h3>
+  <select onChange={(e) => setSelectedListId(Number(e.target.value))} value={selectedListId ?? ""}>
+    <option value="">Wybierz listę</option>
+    {lists
+      .filter((list) => list.name !== "Ocenione Filmy")
+      .map((list) => (
+        <option key={list.id} value={list.id}>{list.name}</option>
+      ))}
+  </select>
+  <button onClick={handleAddMovieToList} disabled={!selectedListId}>Dodaj do listy</button>
 
-          <input type="text" placeholder="Nazwa nowej listy" value={newListName} onChange={(e) => setNewListName(e.target.value)} />
-          <button onClick={createNewList} disabled={!newListName.trim()}>Stwórz listę</button>
-        </div>
+  <input type="text" placeholder="Nazwa nowej listy" value={newListName} onChange={(e) => setNewListName(e.target.value)} />
+  <button onClick={createNewList} disabled={!newListName.trim()}>Stwórz listę</button>
+</div>
+
       </div>
 
       <div className="movie-info">
