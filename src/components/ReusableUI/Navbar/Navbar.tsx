@@ -27,14 +27,13 @@ const Navbar = () => {
       <div className="navbar-left">
         <Logo />
         <ul className="navbar-links">
-          <li><Link to="/">Home</Link></li>
+          <li><Link to="/">Strona główna</Link></li>
           <li><Link to="/films">Filmy</Link></li>
           <li><Link to="/lists">Listy</Link></li>
-          <li><Link to="/profile">Profil</Link></li>
         </ul>
       </div>
       <div className="navbar-middle">
-        <MovieSearch /> {/* Dodajemy nowy komponent wyszukiwarki */}
+        <MovieSearch />
       </div>
       <div className="navbar-right">
         {isLoggedIn ? (

@@ -20,9 +20,6 @@ const API_BASE_URL = "http://127.0.0.1:8000/api";
 const ListsPage = () => {
   const [lists, setLists] = useState<MovieList[]>([]);
   const [newListName, setNewListName] = useState("");
-  const [selectedListId, setSelectedListId] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<Movie[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,12 +28,12 @@ const ListsPage = () => {
 
   const fetchMovieDetails = async (movieId: number) => {
     try {
-      const url = `http://localhost:8000/api/movies/${movieId}/`;
-      console.log("Pobieram film z:", url); // 🔍 Debugowanie URL
-  
+      const url = `${API_BASE_URL}/movies/${movieId}/`;
+      console.log("Pobieram film z:", url);
+
       const response = await fetch(url);
       if (!response.ok) throw new Error(`Błąd pobierania filmu ${movieId}`);
-      
+
       return await response.json();
     } catch (error) {
       console.error(`Błąd pobierania filmu ${movieId}:`, error);
@@ -103,77 +100,36 @@ const ListsPage = () => {
     }
   };
 
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query);
+  const deleteList = async (listId: number) => {
+    if (!window.confirm("Na pewno chcesz usunąć tę listę?")) return;
 
-    if (query.length < 2) {
-      setSearchResults([]);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("Brak tokena, użytkownik niezalogowany");
       return;
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/search-movies/?query=${encodeURIComponent(query)}`);
-      if (!response.ok) throw new Error("Błąd pobierania wyników wyszukiwania");
-      const data = await response.json();
-      setSearchResults(data.results || []);
+      const response = await fetch(`${API_BASE_URL}/lists/${listId}/delete/`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        setLists((prevLists) => prevLists.filter((list) => list.id !== listId));
+      }
     } catch (error) {
-      console.error("Błąd wyszukiwania:", error);
+      console.error("Błąd usuwania listy:", error);
     }
   };
 
-  // const addMovieToList = async (listId: number, movie: Movie) => {
-  //   const token = localStorage.getItem("token");
-
-  //   if (!token) {
-  //     console.error("Brak tokena, użytkownik niezalogowany");
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await fetch(`${API_BASE_URL}/lists/${listId}/add/`, {
-  //       method: "POST",
-  //       headers: {
-  //         Authorization: `Token ${token}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ movie_id: movie.id }),
-  //     });
-
-  //     if (!response.ok) throw new Error(`Błąd API: ${response.status} ${response.statusText}`);
-
-  //     fetchLists();
-  //   } catch (error) {
-  //     console.error("Błąd dodawania filmu:", error);
-  //   }
-  // };
-
-  // const removeMovieFromList = async (listId: number, movieId: number) => {
-  //   const token = localStorage.getItem("token");
-
-  //   if (!token) {
-  //     console.error("Brak tokena, użytkownik niezalogowany");
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await fetch(`${API_BASE_URL}/lists/${listId}/remove/${movieId}/`, {
-  //       method: "DELETE",
-  //       headers: {
-  //         Authorization: `Token ${token}`,
-  //       },
-  //     });
-
-  //     if (response.ok) {
-  //       fetchLists();
-  //     }
-  //   } catch (error) {
-  //     console.error("Błąd usuwania filmu:", error);
-  //   }
-  // };
-
   const handleListClick = (listId: number) => {
-    navigate(`/list/${listId}`);
-  };
+    navigate(`/list/${listId}`); // 🔥 Poprawione!
+  }
+
 
   return (
     <div className="lists-page">
@@ -189,39 +145,23 @@ const ListsPage = () => {
         <button onClick={createList}>Dodaj listę</button>
       </div>
 
-      {/* <div className="search-section">
-        <input
-          type="text"
-          placeholder="Szukaj filmów..."
-          value={searchQuery}
-          onChange={(e) => handleSearch(e.target.value)}
-        />
-        {searchResults.length > 0 && (
-          <ul className="search-results">
-            {searchResults.slice(0, 5).map((movie) => (
-              <li key={movie.id}>
-                <span>{movie.title}</span>
-                <button onClick={() => selectedListId && addMovieToList(selectedListId, movie)}>
-                  Dodaj do listy
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div> */}
-
       <div className="lists-container">
         {lists.length > 0 ? (
           lists.map((list) => (
-            <div key={list.id} className="movie-list" onClick={() => handleListClick(list.id)}>
-              <h2>{list.name}</h2>
-              <div className="movie-cover-stack">
-                {list.movies?.slice(0, 5).map((movie) => (
-                  <div key={movie.id} className="movie-cover">
-                    <img src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} alt={movie.title} />
-                  </div>
-                ))}
+            <div key={list.id} className="movie-list">
+              <div onClick={() => handleListClick(list.id)}>
+                <h2>{list.name}</h2>
+                <div className="movie-cover-stack">
+                  {list.movies?.slice(0, 5).map((movie) => (
+                    <div key={movie.id} className="movie-cover">
+                      <img src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} alt={movie.title} />
+                    </div>
+                  ))}
+                </div>
               </div>
+              <button className="delete-list-btn" onClick={() => deleteList(list.id)}>
+                Usuń listę
+              </button>
             </div>
           ))
         ) : (

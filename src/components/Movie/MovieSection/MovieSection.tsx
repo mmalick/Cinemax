@@ -6,10 +6,10 @@ interface MovieSelectionProps {
   title: string;
   category: 'popular' | 'upcoming' | 'top_rated';
   viewType: 'list' | 'grid';
-  showLoadMore?: boolean; // Nowy opcjonalny prop
+  showLoadMore?: boolean;
 }
 
-const MovieSelection: React.FC<MovieSelectionProps> = ({ title, category, viewType, showLoadMore = false }) => {
+const MovieSelection: React.FC<MovieSelectionProps> = ({ category, viewType, showLoadMore = false }) => {
   const [films, setFilms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);

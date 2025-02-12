@@ -24,6 +24,7 @@ const App: React.FC = () => {
         <Route path="/lists" element={<ListsPage/>} />
         <Route path="/movie/:id" element={<MovieDetailsPage />} />
         <Route path="/list/:id" element={<ListDetailsPage />} />
+
       </Routes>
     </Router>
   );

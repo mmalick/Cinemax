@@ -3,12 +3,10 @@ import "./MovieRatings.css";
 
 interface MovieRatingsProps {
   movieId: string;
-  tmdbRating: number;
-  tmdbVotes: number;
   initialRating?: number | null;
 }
 
-const MovieRatings: React.FC<MovieRatingsProps> = ({ movieId, tmdbRating, tmdbVotes, initialRating = null }) => {
+const MovieRatings: React.FC<MovieRatingsProps> = ({ movieId,initialRating = null }) => {
   const [rating, setRating] = useState<number>(initialRating ?? 0); // Domyślnie 0
   const [hover, setHover] = useState<number | null>(null);
 
@@ -37,10 +35,6 @@ const MovieRatings: React.FC<MovieRatingsProps> = ({ movieId, tmdbRating, tmdbVo
 
   return (
     <div className="movie-ratings">
-      <div className="tmdb-rating">
-        <h3>TMDB Rating: {tmdbRating.toFixed(1)} / 10</h3>
-        <p>({tmdbVotes} votes)</p>
-      </div>
       <div className="user-rating">
         <h3>Twoja ocena:</h3>
         <div className="rating-stars">
@@ -55,7 +49,7 @@ const MovieRatings: React.FC<MovieRatingsProps> = ({ movieId, tmdbRating, tmdbVo
                 onClick={() => handleRating(starValue)}
                 style={{
                   cursor: "pointer",
-                  fontSize: "24px",
+                  fontSize: "28px",
                   transition: "transform 0.2s",
                 }}
               >
@@ -67,6 +61,7 @@ const MovieRatings: React.FC<MovieRatingsProps> = ({ movieId, tmdbRating, tmdbVo
       </div>
     </div>
   );
+  
 };
 
 export default MovieRatings;

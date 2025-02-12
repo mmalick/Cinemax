@@ -19,7 +19,7 @@ User = get_user_model()
 @api_view(['GET'])
 def get_popular_movies(request):
     page = request.GET.get("page", 1)
-    url = f"{TMDB_BASE_URL}/movie/popular?api_key={settings.TMDB_API_KEY}&language=en-US&page={page}"
+    url = f"{TMDB_BASE_URL}/movie/popular?api_key={settings.TMDB_API_KEY}&language=pl-PL&page={page}"
     response = requests.get(url)
     if response.status_code == 200:
         return Response(response.json())
@@ -28,7 +28,7 @@ def get_popular_movies(request):
 @api_view(['GET'])
 def get_upcoming_movies(request):
     page = request.GET.get("page", 1)
-    url = f"{TMDB_BASE_URL}/movie/upcoming?api_key={settings.TMDB_API_KEY}&language=en-US&page={page}"
+    url = f"{TMDB_BASE_URL}/movie/upcoming?api_key={settings.TMDB_API_KEY}&language=pl-PL&page={page}"
     response = requests.get(url)
     if response.status_code == 200:
         return Response(response.json())
@@ -37,7 +37,7 @@ def get_upcoming_movies(request):
 @api_view(['GET'])
 def get_now_playing_movies(request):
     page = request.GET.get("page", 1)
-    url = f"{TMDB_BASE_URL}/movie/now_playing?api_key={settings.TMDB_API_KEY}&language=en-US&page={page}"
+    url = f"{TMDB_BASE_URL}/movie/now_playing?api_key={settings.TMDB_API_KEY}&language=pl-PL&page={page}"
     response = requests.get(url)
     if response.status_code == 200:
         return Response(response.json())
@@ -46,20 +46,26 @@ def get_now_playing_movies(request):
 @api_view(['GET'])
 def get_top_rated_movies(request):
     page = request.GET.get("page", 1)
-    url = f"{TMDB_BASE_URL}/movie/top_rated?api_key={settings.TMDB_API_KEY}&language=en-US&page={page}"
+    url = f"{TMDB_BASE_URL}/movie/top_rated?api_key={settings.TMDB_API_KEY}&language=pl-PL&page={page}"
     response = requests.get(url)
     if response.status_code == 200:
         return Response(response.json())
     return Response({"error": "Failed to fetch movies"}, status=response.status_code)
 
 
+
 @api_view(['GET'])
 def get_movie_details(request, movie_id):
-    movie_url = f"{TMDB_BASE_URL}/movie/{movie_id}?api_key={settings.TMDB_API_KEY}&language=pl-PL"
+    movie_url_pl = f"{TMDB_BASE_URL}/movie/{movie_id}?api_key={settings.TMDB_API_KEY}&language=pl-PL"
+    movie_url_en = f"{TMDB_BASE_URL}/movie/{movie_id}?api_key={settings.TMDB_API_KEY}&language=en-US"
     providers_url = f"{TMDB_BASE_URL}/movie/{movie_id}/watch/providers?api_key={settings.TMDB_API_KEY}"
 
-    movie_response = requests.get(movie_url)
+    movie_response = requests.get(movie_url_pl)
     providers_response = requests.get(providers_url)
+
+    # Jeśli film nie istnieje w PL, pobieramy EN
+    if movie_response.status_code != 200:
+        movie_response = requests.get(movie_url_en)
 
     if movie_response.status_code != 200:
         return JsonResponse({"error": "Nie znaleziono filmu"}, status=404)
@@ -67,13 +73,21 @@ def get_movie_details(request, movie_id):
     movie_data = movie_response.json()
     providers_data = providers_response.json()
 
+    # 🔥 Nowa logika: Jeśli polska okładka nie istnieje, pobieramy angielską
+    poster_path = movie_data.get("poster_path")
+    if not poster_path:  
+        movie_response = requests.get(movie_url_en)
+        if movie_response.status_code == 200:
+            movie_data = movie_response.json()
+            poster_path = movie_data.get("poster_path")
+
     providers = providers_data.get("results", {}).get("PL", {}).get("flatrate", [])
 
     return JsonResponse({
-        "id": movie_data.get("id"),  # 👈 DODANE – teraz frontend otrzyma poprawne ID!
+        "id": movie_data.get("id"),
         "title": movie_data.get("title"),
         "overview": movie_data.get("overview"),
-        "poster_path": movie_data.get("poster_path"),
+        "poster_path": poster_path,  # ✅ Teraz PL jeśli jest, EN jeśli nie
         "vote_average": movie_data.get("vote_average"),
         "vote_count": movie_data.get("vote_count"),
         "streaming": [
@@ -81,6 +95,7 @@ def get_movie_details(request, movie_id):
             for p in providers
         ]
     })
+
 
 @api_view(['GET'])
 def get_movie_credits(request, movie_id):
@@ -229,18 +244,6 @@ def add_movie_to_list(request, list_id):
     return Response({"message": "Film dodany do listy"}, status=status.HTTP_200_OK)
 
 
-# ✅ Usuwanie filmu z listy
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def remove_movie_from_list(request, list_id, movie_id):
-    print(f"Użytkownik: {request.user}")  # ✅ Debugowanie użytkownika
-
-    movie_list = get_object_or_404(MovieList, id=list_id, user=request.user)
-
-    movie = get_object_or_404(Movie, id=movie_id)
-    movie_list.movies.remove(movie)
-
-    return Response({"message": "Film usunięty z listy"}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -257,4 +260,42 @@ def get_movie_list_details(request, list_id):
     }, status=status.HTTP_200_OK)
 
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_movie_list(request, list_id):
+    movie_list = get_object_or_404(MovieList, id=list_id, user=request.user)
+    movie_list.delete()
+    return Response({"message": "Lista filmów została usunięta"}, status=status.HTTP_200_OK)
 
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_movie_from_list(request, list_id, movie_id):
+    movie_list = get_object_or_404(MovieList, id=list_id, user=request.user)
+
+    if movie_id not in movie_list.movie_ids:
+        return Response({"error": "Film nie znajduje się na liście"}, status=status.HTTP_400_BAD_REQUEST)
+
+    movie_list.movie_ids.remove(movie_id)
+    movie_list.save()
+
+    return Response({"message": "Film usunięty z listy"}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_movies(request, category):
+    page = request.GET.get("page", 1)
+    language = request.GET.get("language", "pl-PL")  # 🔥 Pobieramy język z parametru, domyślnie PL
+
+    allowed_categories = ["popular", "now_playing", "top_rated", "upcoming"]
+    if category not in allowed_categories:
+        return JsonResponse({"error": "Niepoprawna kategoria"}, status=400)
+
+    url = f"{TMDB_BASE_URL}/movie/{category}?api_key={settings.TMDB_API_KEY}&language={language}&page={page}"
+    
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        return JsonResponse(response.json())
+
+    return JsonResponse({"error": "Nie udało się pobrać filmów"}, status=response.status_code)

@@ -61,7 +61,8 @@ const MovieCast: React.FC<MovieCastProps> = ({ movieId }) => {
 
   return (
     <div className="movie-cast">
-      <h2 className="movie-cast-title">Obsada</h2>
+      {/* <h2 className="movie-cast-title">Obsada</h2>
+      <br /> */}
       <div
         className={`movie-cast-container ${isDragging ? "grabbing" : ""}`}
         ref={listRef}

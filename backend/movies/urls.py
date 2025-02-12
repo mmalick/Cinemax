@@ -15,6 +15,8 @@ from .views import (
     add_movie_to_list,
     remove_movie_from_list,
     get_movie_list_details,
+    delete_movie_list,
+    get_movies,
 )
 
 urlpatterns = [
@@ -33,5 +35,7 @@ urlpatterns = [
     path("lists/create/", create_movie_list, name="create-movie-list"),
     path("lists/<int:list_id>/add/", add_movie_to_list, name="add-movie-to-list"),
     path("lists/<int:list_id>/remove/<int:movie_id>/", remove_movie_from_list, name="remove-movie-from-list"),
+    path("lists/<int:list_id>/delete/", delete_movie_list, name="delete-movie-list"),
+    
 ]
 

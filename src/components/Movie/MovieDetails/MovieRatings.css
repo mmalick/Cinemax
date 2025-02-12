@@ -1,39 +1,23 @@
 .movie-ratings {
-    text-align: center;
-    margin-top: 20px;
-  }
-  
-  .tmdb-rating h3 {
-    font-size: 18px;
-    margin-bottom: 5px;
-  }
-  
-  .user-rating h3 {
-    font-size: 18px;
-    margin-top: 10px;
-  }
-  
-  .rating-stars {
-    display: flex;
-    flex-direction: row; /* Gwiazdki w jednym rzędzie */
-    justify-content: center;
-    gap: 5px; /* Odstęp między gwiazdkami */
-    margin-top: 5px;
-  }
-  
-  .star {
-    font-size: 28px; /* Rozmiar gwiazdek */
-    cursor: pointer;
-    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
-  }
-  
-  .star:hover {
-    transform: scale(1.2); /* Powiększenie gwiazdki przy najechaniu */
-  }
-  
-  .user-rating-text {
-    font-size: 16px;
-    margin-top: 10px;
-    font-weight: bold;
-  }
-  
+  text-align: center;
+  margin-top: 20px;
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+}
+.rating-stars {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.star {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  transition: color 0.2s ease;
+}
+.star:hover {
+  color: #ffcc00;
+}

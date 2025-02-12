@@ -31,13 +31,13 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
-from django.db import models
-from django.conf import settings
 
 class MovieList(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="movie_lists")
     name = models.CharField(max_length=255)
-    movie_ids = models.JSONField(default=list, blank=True)
+    movie_ids = models.JSONField(default=list, blank=True) 
 
     def __str__(self):
         return f"{self.name} - {self.user.username}"
+

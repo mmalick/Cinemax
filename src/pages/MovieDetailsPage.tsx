@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import MovieCast from "../components/Movie/MovieDetails/MovieCast";
 import MovieRatings from "../components/Movie/MovieDetails/MovieRatings";
+import "./MovieDetailsPage.css";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api/movies/";
 
@@ -68,7 +69,6 @@ export default function MovieDetailsPage() {
   }, [id, token]);
 
   const fetchLists = async () => {
-    const token = localStorage.getItem("token");
     if (!token) {
       console.error("Brak tokena, użytkownik niezalogowany");
       return;
@@ -88,7 +88,6 @@ export default function MovieDetailsPage() {
       }
 
       const data = await response.json();
-      console.log("Pobrane listy:", data); // Debugowanie list
       setLists(data);
     } catch (error) {
       console.error("Błąd pobierania list:", error);
@@ -96,24 +95,7 @@ export default function MovieDetailsPage() {
   };
 
   const handleAddMovieToList = async () => {
-    const token = localStorage.getItem("token");
-
-    console.log("Token:", token);
-    console.log("Movie ID:", movie?.id);
-    console.log("Selected List ID:", selectedListId);
-
-    if (!token) {
-      console.error("Brak tokena.");
-      return;
-    }
-    if (!selectedListId || isNaN(selectedListId)) {
-      console.error("Nie wybrano listy.");
-      return;
-    }
-    if (!movie?.id) {
-      console.error("Nie znaleziono filmu.");
-      return;
-    }
+    if (!token || !selectedListId || !movie?.id) return;
 
     try {
       const response = await fetch(
@@ -129,10 +111,7 @@ export default function MovieDetailsPage() {
       );
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Błąd API: ${response.status} ${response.statusText} - ${errorText}`
-        );
+        throw new Error(`Błąd API: ${response.status} ${response.statusText}`);
       }
 
       console.log(`Film ${movie.title} dodany do listy ${selectedListId}`);
@@ -142,8 +121,6 @@ export default function MovieDetailsPage() {
   };
 
   const createNewList = async () => {
-    const token = localStorage.getItem("token");
-
     if (!token || !newListName.trim()) return;
 
     try {
@@ -170,22 +147,15 @@ export default function MovieDetailsPage() {
 
   return (
     <div className="movie-details">
-      <img
-        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-        alt={movie.title}
-        className="movie-poster"
-      />
-      <div className="movie-info">
-        <h1>{movie.title}</h1>
-        <p>{movie.overview}</p>
-        <p className="rating">
-          ⭐ {movie.vote_average.toFixed(1)} ({movie.vote_count} głosów)
-        </p>
-
-        {/* Streaming */}
+      <div className="movie-left">
+        <img
+          src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+          alt={movie.title}
+          className="movie-poster"
+        />
         {movie.streaming?.length ? (
           <div className="streaming-section">
-            <h3>Gdzie obejrzeć:</h3>
+            <h3 className="streaming-title">Gdzie obejrzeć:</h3>
             <div className="streaming-list">
               {movie.streaming.map((provider) => (
                 <div key={provider.name} className="streaming-provider">
@@ -196,49 +166,35 @@ export default function MovieDetailsPage() {
             </div>
           </div>
         ) : (
-          <p>Brak informacji o dostępności</p>
+          <p className="no-streaming">Brak informacji o dostępności</p>
         )}
 
-        {/* Wybór listy */}
-        <div className="add-to-list-section">
-          <h3>Dodaj do listy:</h3>
-          <select
-            onChange={(e) => setSelectedListId(Number(e.target.value))}
-            value={selectedListId ?? ""}
-          >
+        <div className="list-management">
+          <h3>Zarządzanie listami:</h3>
+          <select onChange={(e) => setSelectedListId(Number(e.target.value))} value={selectedListId ?? ""}>
             <option value="">Wybierz listę</option>
             {lists.map((list) => (
-              <option key={list.id} value={list.id}>
-                {list.name}
-              </option>
+              <option key={list.id} value={list.id}>{list.name}</option>
             ))}
           </select>
-          <button onClick={handleAddMovieToList} disabled={!selectedListId}>
-            Dodaj do listy
-          </button>
-        </div>
+          <button onClick={handleAddMovieToList} disabled={!selectedListId}>Dodaj do listy</button>
 
-        {/* Tworzenie nowej listy */}
-        <div className="create-new-list-section">
-          <h3>Lub stwórz nową listę:</h3>
-          <input
-            type="text"
-            placeholder="Nazwa nowej listy"
-            value={newListName}
-            onChange={(e) => setNewListName(e.target.value)}
-          />
-          <button onClick={createNewList} disabled={!newListName.trim()}>
-            Stwórz listę
-          </button>
+          <input type="text" placeholder="Nazwa nowej listy" value={newListName} onChange={(e) => setNewListName(e.target.value)} />
+          <button onClick={createNewList} disabled={!newListName.trim()}>Stwórz listę</button>
         </div>
+      </div>
 
-        <MovieCast movieId={id ?? ""} />
-        <MovieRatings
-          movieId={id ?? ""}
-          tmdbRating={movie.vote_average}
-          tmdbVotes={movie.vote_count}
-          initialRating={userRating}
-        />
+      <div className="movie-info">
+        <h1>{movie.title}</h1>
+        <p>{movie.overview}</p>
+        <div className="rating">
+          <p>⭐ {movie.vote_average.toFixed(1)} ({movie.vote_count} głosów)</p>
+          <MovieRatings movieId={id ?? ""} initialRating={userRating} />
+        </div>
+        <div className="movie-cast">
+          <h2 className="movie-cast-title">Obsada</h2>
+          <MovieCast movieId={id ?? ""} />
+        </div>
       </div>
     </div>
   );
