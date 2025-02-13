@@ -88,10 +88,10 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* Przesuwa o 50% w poziomie i pionie */
-    width: 60%;  /* Możesz dostosować szerokość, jeśli chcesz */
+    transform: translate(-50%, -50%);
+    width: 60%;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 999;  /* Aby zapewnić, że navbar jest nad innymi elementami */
+    z-index: 999;
   }

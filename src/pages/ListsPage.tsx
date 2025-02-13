@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./ListsPage.css";
 
 interface Movie {
@@ -21,15 +21,17 @@ const ListsPage = () => {
   const [lists, setLists] = useState<MovieList[]>([]);
   const [newListName, setNewListName] = useState("");
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    fetchLists();
-  }, []);
+    if (token) {
+      fetchLists();
+    }
+  }, [token]);
 
   const fetchMovieDetails = async (movieId: number) => {
     try {
       const url = `${API_BASE_URL}/movies/${movieId}/`;
-      console.log("Pobieram film z:", url);
 
       const response = await fetch(url);
       if (!response.ok) throw new Error(`Błąd pobierania filmu ${movieId}`);
@@ -42,11 +44,7 @@ const ListsPage = () => {
   };
 
   const fetchLists = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("Brak tokena, użytkownik niezalogowany");
-      return;
-    }
+    if (!token) return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/lists/`, {
@@ -77,8 +75,6 @@ const ListsPage = () => {
   };
 
   const createList = async () => {
-    const token = localStorage.getItem("token");
-
     if (!token || !newListName.trim()) return;
 
     try {
@@ -103,11 +99,7 @@ const ListsPage = () => {
   const deleteList = async (listId: number) => {
     if (!window.confirm("Na pewno chcesz usunąć tę listę?")) return;
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("Brak tokena, użytkownik niezalogowany");
-      return;
-    }
+    if (!token) return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/lists/${listId}/delete/`, {
@@ -134,39 +126,48 @@ const ListsPage = () => {
     <div className="lists-page">
       <h1>Twoje listy filmów</h1>
 
-      <div className="create-list">
-        <input
-          type="text"
-          placeholder="Nazwa listy"
-          value={newListName}
-          onChange={(e) => setNewListName(e.target.value)}
-        />
-        <button onClick={createList}>Dodaj listę</button>
-      </div>
+      {!token ? (
+        <div className="login-required">
+          <p>Musisz być zalogowany, aby zarządzać listami filmów.</p>
+          <Link to="/login" className="login-link">Zaloguj się</Link>
+        </div>
+      ) : (
+        <>
+          <div className="create-list">
+            <input
+              type="text"
+              placeholder="Nazwa listy"
+              value={newListName}
+              onChange={(e) => setNewListName(e.target.value)}
+            />
+            <button onClick={createList}>Dodaj listę</button>
+          </div>
 
-      <div className="lists-container">
-        {lists.length > 0 ? (
-          lists.map((list) => (
-            <div key={list.id} className="movie-list">
-              <div onClick={() => handleListClick(list.id)}>
-                <h2>{list.name}</h2>
-                <div className="movie-cover-stack">
-                  {list.movies?.slice(0, 5).map((movie) => (
-                    <div key={movie.id} className="movie-cover">
-                      <img src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} alt={movie.title} />
+          <div className="lists-container">
+            {lists.length > 0 ? (
+              lists.map((list) => (
+                <div key={list.id} className="movie-list">
+                  <div onClick={() => handleListClick(list.id)}>
+                    <h2>{list.name}</h2>
+                    <div className="movie-cover-stack">
+                      {list.movies?.slice(0, 5).map((movie) => (
+                        <div key={movie.id} className="movie-cover">
+                          <img src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} alt={movie.title} />
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+                  {!["Ocenione Filmy", "Do obejrzenia"].includes(list.name) && (
+                    <button className="delete-list-btn" onClick={() => deleteList(list.id)}></button>
+                  )}
                 </div>
-              </div>
-              {!["Ocenione Filmy", "Do obejrzenia"].includes(list.name) && (
-                <button className="delete-list-btn" onClick={() => deleteList(list.id)}></button>
-              )}
-            </div>
-          ))
-        ) : (
-          <p>Brak list do wyświetlenia</p>
-        )}
-      </div>
+              ))
+            ) : (
+              <p>Brak list do wyświetlenia</p>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };

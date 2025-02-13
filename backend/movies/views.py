@@ -65,7 +65,6 @@ def get_movie_details(request, movie_id):
     movie_response = requests.get(movie_url_pl)
     providers_response = requests.get(providers_url)
 
-    # Jeśli film nie istnieje w PL, pobieramy EN
     if movie_response.status_code != 200:
         movie_response = requests.get(movie_url_en)
 
@@ -75,7 +74,6 @@ def get_movie_details(request, movie_id):
     movie_data = movie_response.json()
     providers_data = providers_response.json()
 
-    # 🔥 Nowa logika: Jeśli polska okładka nie istnieje, pobieramy angielską
     poster_path = movie_data.get("poster_path")
     if not poster_path:  
         movie_response = requests.get(movie_url_en)
@@ -89,7 +87,7 @@ def get_movie_details(request, movie_id):
         "id": movie_data.get("id"),
         "title": movie_data.get("title"),
         "overview": movie_data.get("overview"),
-        "poster_path": poster_path,  # ✅ Teraz PL jeśli jest, EN jeśli nie
+        "poster_path": poster_path,
         "vote_average": movie_data.get("vote_average"),
         "vote_count": movie_data.get("vote_count"),
         "streaming": [
@@ -138,7 +136,6 @@ def register_user(request):
         password=data['password']
     )
 
-    # ✅ Tworzenie domyślnych list po rejestracji
     MovieList.objects.create(user=user, name="Ocenione Filmy", is_default=True)
     MovieList.objects.create(user=user, name="Do obejrzenia", is_default=True)
 
@@ -179,7 +176,6 @@ def rate_movie(request, movie_id):
             defaults={"rating": rating_value}
         )
 
-        # ✅ Dodajemy film do listy „Ocenione Filmy”
         rated_list, _ = MovieList.objects.get_or_create(user=request.user, name="Ocenione Filmy", is_default=True)
 
         if str(movie_id) not in rated_list.movie_ids:
@@ -194,7 +190,7 @@ def rate_movie(request, movie_id):
 def search_movies(request):
     query = request.GET.get("query", "")
 
-    if len(query) < 2:  # Minimalna długość wyszukiwania
+    if len(query) < 2:
         return JsonResponse({"results": []})
 
     url = f"https://api.themoviedb.org/3/search/movie"
@@ -210,11 +206,11 @@ def search_movies(request):
 
     return JsonResponse(response.json())
 
-# ✅ Pobieranie list użytkownika
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_movie_lists(request):
-    print(f"Użytkownik: {request.user}")  # ✅ Debugowanie użytkownika
+    print(f"Użytkownik: {request.user}")
 
     if not request.user.is_authenticated:
         return Response({"error": "Brak autoryzacji"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -223,7 +219,6 @@ def get_movie_lists(request):
     serializer = MovieListSerializer(lists, many=True)
     return Response(serializer.data)
 
-# ✅ Tworzenie nowej listy
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_movie_list(request):
@@ -237,7 +232,7 @@ def create_movie_list(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_movie_to_list(request, list_id):
-    print(f"Użytkownik: {request.user}")  # ✅ Debugowanie użytkownika
+    print(f"Użytkownik: {request.user}")
 
     if not request.user.is_authenticated:
         return Response({"error": "Użytkownik niezalogowany"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -248,11 +243,9 @@ def add_movie_to_list(request, list_id):
     if not movie_id:
         return Response({"error": "Brak ID filmu"}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Jeśli film już jest na liście, nie dodawaj ponownie
     if movie_id in movie_list.movie_ids:
         return Response({"message": "Film już znajduje się na liście"}, status=status.HTTP_200_OK)
 
-    # Dodajemy ID filmu do listy
     movie_list.movie_ids.append(movie_id)
     movie_list.save()
 
@@ -265,13 +258,12 @@ def add_movie_to_list(request, list_id):
 def get_movie_list_details(request, list_id):
     movie_list = get_object_or_404(MovieList, id=list_id, user=request.user)
 
-    # ✅ Pobieramy `movie_ids` zamiast `movies`
     movie_ids = movie_list.movie_ids if isinstance(movie_list.movie_ids, list) else []
 
     return Response({
         "id": movie_list.id,
         "name": movie_list.name,
-        "movie_ids": movie_ids,  # Zmieniamy z "movies" na "movie_ids"
+        "movie_ids": movie_ids,
     }, status=status.HTTP_200_OK)
 
 
@@ -305,7 +297,7 @@ def remove_movie_from_list(request, list_id, movie_id):
 @api_view(['GET'])
 def get_movies(request, category):
     page = request.GET.get("page", 1)
-    language = request.GET.get("language", "pl-PL")  # 🔥 Pobieramy język z parametru, domyślnie PL
+    language = request.GET.get("language", "pl-PL")
 
     allowed_categories = ["popular", "now_playing", "top_rated", "upcoming"]
     if category not in allowed_categories:
@@ -325,12 +317,11 @@ def get_movie_of_the_day(request):
     """Zwraca losowy film dnia, ale zmienia go tylko raz dziennie."""
     
     today = datetime.date.today().isoformat()
-    cached_movie = cache.get("movie_of_the_day")  # 🔥 Sprawdzamy, czy mamy zapisany film
+    cached_movie = cache.get("movie_of_the_day")
     
     if cached_movie and cached_movie.get("date") == today:
-        return JsonResponse(cached_movie["movie"])  # ✅ Jeśli mamy film na dzisiaj, zwracamy go
+        return JsonResponse(cached_movie["movie"])
 
-    # Jeśli nie mamy filmu dnia, pobieramy nowy
     url = f"{TMDB_BASE_URL}/movie/popular?api_key={settings.TMDB_API_KEY}&language=pl-PL&page=1"
     response = requests.get(url)
 
@@ -341,14 +332,13 @@ def get_movie_of_the_day(request):
     if not data:
         return JsonResponse({"error": "Brak dostępnych filmów"}, status=404)
 
-    random_movie = random.choice(data)  # 🔥 Wybieramy losowy film
+    random_movie = random.choice(data)
 
-    # ✅ Zapisujemy film dnia w cache
     cache.set("movie_of_the_day", {"date": today, "movie": {
         "id": random_movie["id"],
         "title": random_movie["title"],
         "overview": random_movie["overview"],
         "poster_path": random_movie["poster_path"]
-    }}, timeout=86400)  # ⏳ 24h cache
+    }}, timeout=86400)
 
     return JsonResponse(random_movie)

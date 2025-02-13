@@ -3,7 +3,7 @@ import './FilmList.css';
 import FilmCard from '../FilmCard/FilmCard';
 
 interface Film {
-  id: number; // Dodajemy ID filmu
+  id: number;
   poster_url: string;
   title: string;
   overview: string;

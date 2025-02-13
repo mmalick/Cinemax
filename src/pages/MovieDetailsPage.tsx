@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import MovieCast from "../components/Movie/MovieDetails/MovieCast";
 import MovieRatings from "../components/Movie/MovieDetails/MovieRatings";
 import "./MovieDetailsPage.css";
@@ -120,9 +120,8 @@ export default function MovieDetailsPage() {
         throw new Error(`Błąd API: ${response.status} ${response.statusText}`);
       }
 
-      showNotification(` Film "${movie.title}" dodany do listy!`);
+      showNotification(`Film "${movie.title}" dodany do listy!`);
     } catch (error) {
-      showNotification("Błąd dodawania filmu. Spróbuj ponownie.");
       console.error("Błąd dodawania filmu:", error);
     }
   };
@@ -145,7 +144,7 @@ export default function MovieDetailsPage() {
         setNewListName("");
         fetchLists();
 
-        showNotification(`✅ Lista "${createdList.name}" została utworzona!`);
+        showNotification(`Lista "${createdList.name}" została utworzona!`);
 
         await fetch(`http://127.0.0.1:8000/api/lists/${createdList.id}/add/`, {
           method: "POST",
@@ -156,10 +155,9 @@ export default function MovieDetailsPage() {
           body: JSON.stringify({ movie_id: movie.id }),
         });
 
-        showNotification(`🎬 Film "${movie.title}" dodany do nowej listy!`);
+        showNotification(`Film "${movie.title}" dodany do nowej listy!`);
       }
     } catch (error) {
-      showNotification("❌ Błąd tworzenia listy.");
       console.error("Błąd tworzenia listy:", error);
     }
   };
@@ -177,6 +175,7 @@ export default function MovieDetailsPage() {
           alt={movie.title}
           className="movie-poster"
         />
+
         {movie.streaming?.length ? (
           <div className="streaming-section">
             <h3 className="streaming-title">Gdzie obejrzeć:</h3>
@@ -192,24 +191,43 @@ export default function MovieDetailsPage() {
         ) : (
           <p className="no-streaming">Brak informacji o dostępności</p>
         )}
-{notification && <div className="notification">{notification}</div>}
 
-<div className="list-management">
-  <h3>Zarządzanie listami:</h3>
-  <select onChange={(e) => setSelectedListId(Number(e.target.value))} value={selectedListId ?? ""}>
-    <option value="">Wybierz listę</option>
-    {lists
-      .filter((list) => list.name !== "Ocenione Filmy")
-      .map((list) => (
-        <option key={list.id} value={list.id}>{list.name}</option>
-      ))}
-  </select>
-  <button onClick={handleAddMovieToList} disabled={!selectedListId}>Dodaj do listy</button>
+        {token && (
+          <div className="list-management">
+            <h3>Zarządzanie listami:</h3>
+            <select
+              onChange={(e) =>
+                setSelectedListId(e.target.value ? Number(e.target.value) : null)
+              }
+              value={selectedListId ?? ""}
+            >
+              <option value="" disabled hidden>
+                Wybierz listę
+              </option>
+              {lists
+                .filter((list) => list.name !== "Ocenione Filmy")
+                .map((list) => (
+                  <option key={list.id} value={list.id}>
+                    {list.name}
+                  </option>
+                ))}
+            </select>
 
-  <input type="text" placeholder="Nazwa nowej listy" value={newListName} onChange={(e) => setNewListName(e.target.value)} />
-  <button onClick={createNewList} disabled={!newListName.trim()}>Stwórz listę</button>
-</div>
+            <button onClick={handleAddMovieToList} disabled={!selectedListId}>
+              Dodaj do listy
+            </button>
 
+            <input
+              type="text"
+              placeholder="Nazwa nowej listy"
+              value={newListName}
+              onChange={(e) => setNewListName(e.target.value)}
+            />
+            <button onClick={createNewList} disabled={!newListName.trim()}>
+              Stwórz listę
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="movie-info">
@@ -217,12 +235,12 @@ export default function MovieDetailsPage() {
         <p>{movie.overview}</p>
         <div className="rating">
           <p>Oceny TMDB: ⭐ {movie.vote_average.toFixed(1)} ({movie.vote_count} głosów)</p>
-          <MovieRatings movieId={id ?? ""} initialRating={userRating} />
+          {token ? <MovieRatings movieId={id ?? ""} initialRating={userRating} /> : (
+            <p className="blocked-rating">Zaloguj się, aby ocenić ten film. <Link to="/login" className="login-link">Zaloguj się</Link></p>
+          )}
         </div>
-        <div className="movie-cast">
-          <h2 className="movie-cast-title">Obsada</h2>
-          <MovieCast movieId={id ?? ""} />
-        </div>
+        <h2 className="movie-cast-title">Obsada</h2>
+        <MovieCast movieId={id ?? ""} />
       </div>
     </div>
   );

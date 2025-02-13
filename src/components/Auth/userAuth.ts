@@ -10,17 +10,17 @@ const useUserAuth = () => {
 
     if (token && loginTime) {
       const now = Date.now();
-      const threeDaysInMs = 3 * 24 * 60 * 60 * 1000; // 3 dni w milisekundach
+      const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
 
       if (now - Number(loginTime) > threeDaysInMs) {
         console.log("Token wygasł, wylogowywanie...");
         localStorage.removeItem("token");
         localStorage.removeItem("username");
         localStorage.removeItem("loginTime");
-        navigate("/login"); // Przekierowanie na stronę logowania
+        navigate("/login");
       }
     }
-  }, [navigate]); // Hook w useEffect zależy od navigate
+  }, [navigate]);
 };
 
 export default useUserAuth;

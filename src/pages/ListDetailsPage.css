@@ -15,9 +15,9 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 850px; /* Większa szerokość dla lepszego rozmieszczenia */
-  margin-top: 35px; /* Przesuwa całość niżej */
-  padding: 30px 20px; /* Większy padding dla lepszego odstępu */
+  max-width: 850px;
+  margin-top: 35px;
+  padding: 30px 20px;
 }
 
 .list-title {
@@ -30,7 +30,7 @@
   display: inline-block;
   padding-bottom: 5px;
   margin: 0;
-  margin-left: 20px; /* Przesunięcie w prawo */
+  margin-left: 20px;
 }
 
 .delete-list-btn {
@@ -53,11 +53,6 @@
   transform: scale(1.05);
 }
 
-
-
-
-
-/* Stylizacja pojedynczego filmu */
 .movie-item {
   display: flex;
   flex-direction: column;
@@ -82,12 +77,11 @@
   border-radius: 12px;
 }
 
-/* Stylizacja przycisku usuwania filmu */
 .remove-movie-btn {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: rgba(255, 255, 255, 0.1); /* Lekko widoczne tło */
+  background: rgba(255, 255, 255, 0.1);
   color: white !important;
   border: none;
   padding: 6px;
@@ -115,41 +109,10 @@
   font-weight: bold;
 }
 
-
 .movie-item:hover .remove-movie-btn {
   opacity: 1;
 }
 
-
-
-/* Poprawiona responsywność */
-@media (max-width: 768px) {
-  .movie-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
-}
-
-@media (max-width: 480px) {
-  .movie-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  }
-
-  .movie-item {
-    width: 140px;
-  }
-
-  .movie-item img {
-    height: 200px;
-  }
-
-  .remove-movie-btn {
-    width: 30px;
-    height: 30px;
-    font-size: 12px;
-  }
-}
-
-/* Stylizacja pustej listy */
 .empty-list-message {
   font-size: 18px;
   color: #aaa;

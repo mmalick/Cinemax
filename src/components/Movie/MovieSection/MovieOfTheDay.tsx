@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./MovieOfTheDay.css"; // 🔥 Dodajemy style
+import "./MovieOfTheDay.css";
 import { Link } from "react-router-dom";
 
 interface Movie {

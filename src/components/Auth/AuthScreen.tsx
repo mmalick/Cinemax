@@ -13,19 +13,18 @@ const AuthScreen: React.FC<AuthProps> = ({ isSignUp = false }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const [showNotification, setShowNotification] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (isSignUp && password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError("Hasła nie pasują do siebie.");
       return;
     }
 
     setError("");
-    setMessage("");
 
     const userData = isSignUp
       ? { username, email, password } 
@@ -46,17 +45,21 @@ const AuthScreen: React.FC<AuthProps> = ({ isSignUp = false }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || "Something went wrong");
+        throw new Error(data.detail || "Coś poszło nie tak.");
       }
 
       if (isSignUp) {
-        setMessage("Registration successful! You can now log in.");
+        setShowNotification(true); 
+        setTimeout(() => {
+          setShowNotification(false);
+          navigate("/login");
+        }, 3000);
       } else {
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", data.username);
         localStorage.setItem("loginTime", Date.now().toString());
-        window.dispatchEvent(new Event("storage")); 
-        navigate("/"); 
+        window.dispatchEvent(new Event("storage"));
+        navigate("/");
       }
     } catch (error: any) {
       setError(error.message);
@@ -70,7 +73,6 @@ const AuthScreen: React.FC<AuthProps> = ({ isSignUp = false }) => {
         <div className="auth-box">
           <h2>{isSignUp ? "Rejestracja" : "Logowanie"}</h2>
           {error && <p className="error-message">{error}</p>}
-          {message && <p className="success-message">{message}</p>}
           <form onSubmit={handleSubmit}>
             <input
               type="text"
@@ -120,6 +122,12 @@ const AuthScreen: React.FC<AuthProps> = ({ isSignUp = false }) => {
           </p>
         </div>
       </div>
+
+      {showNotification && (
+        <div className="notification success-notification">
+          Konto utworzone! Teraz możesz się zalogować.
+        </div>
+      )}
     </>
   );
 };

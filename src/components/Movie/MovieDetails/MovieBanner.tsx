@@ -31,6 +31,7 @@ const MovieBanner: React.FC = () => {
     >
       <div className="banner-overlay">
         <h1 className="banner-title">Mighty Movie Tracker</h1>
+        
       </div>
     </div>
   );

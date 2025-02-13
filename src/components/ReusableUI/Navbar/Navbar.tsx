@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./Navbar.css";
 import Logo from "./Logo";
-import MovieSearch from "../../Movie/MovieSection/MovieSearch"; // Import wyszukiwarki filmów
+import MovieSearch from "../../Movie/MovieSection/MovieSearch";
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
@@ -27,7 +27,6 @@ const Navbar = () => {
       <div className="navbar-left">
         <Logo />
         <ul className="navbar-links">
-          <li><Link to="/">Strona główna</Link></li>
           <li><Link to="/films">Filmy</Link></li>
           <li><Link to="/lists">Listy</Link></li>
         </ul>

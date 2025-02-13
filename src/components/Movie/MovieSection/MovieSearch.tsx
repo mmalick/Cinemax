@@ -8,7 +8,6 @@ const MovieSearch = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Czyszczenie po zmianie strony
   useEffect(() => {
     setSearchQuery("");
     setSearchResults([]);

@@ -91,7 +91,7 @@ const ListDetailsPage = () => {
 
   const removeMovie = async (movieId: number) => {
     const token = localStorage.getItem("token");
-    if (!token || list?.name === "Ocenione Filmy") return; // ❌ Nie można usuwać z "Ocenione Filmy"
+    if (!token || list?.name === "Ocenione Filmy") return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/lists/${id}/remove/${movieId}/`, {
@@ -151,7 +151,7 @@ const ListDetailsPage = () => {
           {movies.length > 0 ? (
             <FilmGrid
               films={movies}
-              removeMovie={list.name !== "Ocenione Filmy" ? removeMovie : undefined} // 🔥 Ukrycie usuwania dla "Ocenione Filmy"
+              removeMovie={list.name !== "Ocenione Filmy" ? removeMovie : undefined}
             />
           ) : (
             <p className="empty-list-message">Lista jest pusta</p>

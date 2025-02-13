@@ -27,10 +27,10 @@ const MovieCast: React.FC<MovieCastProps> = ({ movieId }) => {
         const response = await fetch(`${API_BASE_URL}${movieId}/credits/`);
         if (!response.ok) throw new Error("Nie znaleziono obsady");
         const data = await response.json();
-        setActors(data.actors); // Poprawione: `actors`, nie `cast`
+        setActors(data.actors);
       } catch (error) {
         console.error(error);
-        setActors([]); // Jeśli błąd, ustaw pustą tablicę
+        setActors([]);
       }
     }
     fetchCast();
@@ -61,8 +61,6 @@ const MovieCast: React.FC<MovieCastProps> = ({ movieId }) => {
 
   return (
     <div className="movie-cast">
-      {/* <h2 className="movie-cast-title">Obsada</h2>
-      <br /> */}
       <div
         className={`movie-cast-container ${isDragging ? "grabbing" : ""}`}
         ref={listRef}
