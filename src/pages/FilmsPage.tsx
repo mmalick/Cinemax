@@ -1,12 +1,12 @@
 import React from 'react';
-import Navbar from '../components/Navbar/Navbar';
-import Films from '../components/Films/Films';
+import Navbar from '../components/ReusableUI/Navbar/Navbar';
+import MovieSection from '../components/Movie/MovieSection/MovieSection';
 
 const FilmsPage: React.FC = () => {
   return (
     <div className="films-page">
       <Navbar />
-      <Films />
+      <MovieSection title="Najwyżej oceniane" category="top_rated" viewType="grid" showLoadMore={true} />
     </div>
   );
 };
