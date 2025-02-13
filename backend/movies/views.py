@@ -1,4 +1,6 @@
 import requests
+import random
+import datetime
 from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -11,7 +13,7 @@ from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Rating, MovieList
 from .serializers import MovieListSerializer
-from movies.models import Movie
+from django.core.cache import cache
 
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 User = get_user_model()
@@ -317,3 +319,36 @@ def get_movies(request, category):
         return JsonResponse(response.json())
 
     return JsonResponse({"error": "Nie udało się pobrać filmów"}, status=response.status_code)
+
+@api_view(['GET'])
+def get_movie_of_the_day(request):
+    """Zwraca losowy film dnia, ale zmienia go tylko raz dziennie."""
+    
+    today = datetime.date.today().isoformat()
+    cached_movie = cache.get("movie_of_the_day")  # 🔥 Sprawdzamy, czy mamy zapisany film
+    
+    if cached_movie and cached_movie.get("date") == today:
+        return JsonResponse(cached_movie["movie"])  # ✅ Jeśli mamy film na dzisiaj, zwracamy go
+
+    # Jeśli nie mamy filmu dnia, pobieramy nowy
+    url = f"{TMDB_BASE_URL}/movie/popular?api_key={settings.TMDB_API_KEY}&language=pl-PL&page=1"
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        return JsonResponse({"error": "Nie udało się pobrać filmu dnia"}, status=500)
+
+    data = response.json().get("results", [])
+    if not data:
+        return JsonResponse({"error": "Brak dostępnych filmów"}, status=404)
+
+    random_movie = random.choice(data)  # 🔥 Wybieramy losowy film
+
+    # ✅ Zapisujemy film dnia w cache
+    cache.set("movie_of_the_day", {"date": today, "movie": {
+        "id": random_movie["id"],
+        "title": random_movie["title"],
+        "overview": random_movie["overview"],
+        "poster_path": random_movie["poster_path"]
+    }}, timeout=86400)  # ⏳ 24h cache
+
+    return JsonResponse(random_movie)

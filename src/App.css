@@ -14,3 +14,8 @@
 .read-the-docs {
   color: #888;
 }
+body {
+  background: linear-gradient(to bottom, #1b1e2f, #0a0a0a);
+  color: white;
+}
+

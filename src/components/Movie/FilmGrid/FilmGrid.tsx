@@ -10,7 +10,7 @@ interface Film {
 
 interface FilmGridProps {
   films: Film[];
-  removeMovie?: (movieId: number) => void; // ✅ Dodajemy opcjonalne usuwanie
+  removeMovie?: (movieId: number) => void;
 }
 
 const FilmGrid: React.FC<FilmGridProps> = ({ films, removeMovie }) => {

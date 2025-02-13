@@ -4,7 +4,7 @@ import FilmGrid from '../FilmGrid/FilmGrid';
 
 interface MovieSelectionProps {
   title: string;
-  category: 'popular' | 'upcoming' | 'top_rated';
+  category: 'popular' | 'upcoming' | 'top_rated' | 'now_playing';
   viewType: 'list' | 'grid';
   showLoadMore?: boolean;
 }
@@ -52,7 +52,8 @@ const MovieSelection: React.FC<MovieSelectionProps> = ({ title, category, viewTy
   style={{
     fontSize: "32px",
     color: "white",
-    marginBottom: "30px",
+    marginBottom: "25px",
+    marginTop: "50px",
     textAlign: "center",
     textTransform: "uppercase",
     letterSpacing: "2px",
