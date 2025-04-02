@@ -29,8 +29,8 @@ To run the project locally, follow these steps:
 
 ### 1️⃣ Clone the repository
 ```bash
-git clone https://github.com/your-user/movie-journal.git
-cd movie-journal
+git clone https://github.com/your-user/cinemax.git
+cd cinemax
 ```
 
 ### 2️⃣ Install dependencies
