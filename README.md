@@ -1,4 +1,4 @@
-# 🎬 Cinemax - Movie Rating and Organization App
+# 🎬 Cinemax - Movie Rating and Organization
 
 ## 📌 Project Description
 Cinemax is a web application that allows users to browse a movie database, view detailed information about productions, and organize them into private lists. Users can rate watched movies, making it a personal movie diary. Unlike popular services, this application is designed **for a single user** and does not include social features.
